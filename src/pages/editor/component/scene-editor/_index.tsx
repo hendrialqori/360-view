@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 import * as Recoil from 'recoil'
-import { scene } from '@/store/scene';
+import { scene, viewerCoordinate, initialViewerCoordinate } from '@/store/scene';
 import { useSearchParams } from 'react-router-dom';
-
 
 
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 //@ts-ignore
 import { Pannellum } from "pannellum-react";
+
 
 export const SceneEditor = () => {
 
@@ -18,14 +18,21 @@ export const SceneEditor = () => {
 
   const [sceneAtom, setSceneAtom] = Recoil.useRecoilState(scene)
 
+  const initialViewerCoordinateAtom = Recoil.useRecoilValue(initialViewerCoordinate)
+
+  const setViewerCoordinatAtom = Recoil.useSetRecoilState(viewerCoordinate)
+
   const [viewCoordinate, setViewCoordinate] = React.useState({
     pitch: null as number | null,
     yaw: null as number | null
   })
 
-  const [isDragging, setDragging] = React.useState(false)
+  const [mouse, setMouse] = React.useState({
+    x: 20,
+    y: 20
+  })
 
-  console.log(viewCoordinate)
+  const [offset, setOffset] = React.useState({ x: 0, y: 0 });
 
   const currentScene = React.useMemo(() => {
     const temp = sceneAtom.find((scene) => scene.id === query.get('sceneId'))
@@ -34,59 +41,133 @@ export const SceneEditor = () => {
   }, [query, sceneAtom])
 
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setDragging(true)
+  const handleMouseDown = () => {
+    // console.log({
+    //   pitch: viewRef?.current?.panorama?.getPitch(),
+    //   yaw: viewRef?.current?.panorama?.getYaw()
+    // })
+    const p = viewRef?.current?.getViewer()?.mouseEventToCoords(event)[0] as number
+    const y = viewRef?.current?.getViewer()?.mouseEventToCoords(event)[1] as number
+    setViewCoordinate({
+      pitch: p,
+      yaw: y
+    })
   }
 
-  // const handleMouseMove = (event: React.MouseEvent) => { 
-  //   if(isDragging){
-  //     const { movementX, movementY } = event
-  //   }
+  const handleMouseUp = () => {
+    console.log({
+      pitch: viewRef?.current?.panorama?.getPitch(),
+      yaw: viewRef?.current?.panorama?.getYaw()
+    })
+  }
+
+  const [isDragging, setDragging] = React.useState(false)
+
+  // const handleMouseDownItem = (e: React.MouseEvent) => {
+  //   e.preventDefault()
+
+  //   setDragging(true)
+
+  //   setOffset({
+  //     x: e.clientX - mouse.x,
+  //     y: e.clientY - mouse.y,
+  //   });
+
   // }
 
-  // const handleMouseUp = (e: React.MouseEvent) => {
+  // const handleMouseUpItem = () => {
   //   setDragging(false)
   // }
 
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const x = e.clientX - offset.x
+    const y = e.clientY - offset.y
+
+    if (isDragging) {
+      setMouse({ x, y })
+    }
+  }
+
+  const handleSubscribe = () => {
+    const pitch = viewRef?.current?.getViewer()?.getPitch()
+    const yaw = viewRef?.current?.getViewer()?.getYaw()
+    setViewerCoordinatAtom({ pitch, yaw })
+  }
 
 
   return (
     <div
       className="col-span-10 h-[calc(100vh_-_60px)] overflow-scroll relative"
-      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
     >
+      {currentScene?.image && (
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: '1000',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <div className='h-6 w-6 rounded-full bg-black/40 text-white flex justify-center items-center'>
+            <p className='text-lg'>+</p>
+          </div>
+        </div>
+      )}
       <Pannellum
         ref={viewRef}
         width="100%"
-        height="100vh"
+        height="90vh"
         image={currentScene?.image}
         autoLoad={true}
         hfov={100}
         haov={360}
         vaov={180}
+        pitch={initialViewerCoordinateAtom.pitch ?? 0}
+        yaw={initialViewerCoordinateAtom.yaw ?? 0}
         // event
-        onMouseup={(event: any) => {
-          const p = viewRef?.current?.getViewer()?.mouseEventToCoords(event)[0] as number
-          const y = viewRef?.current?.getViewer()?.mouseEventToCoords(event)[1] as number
-          setViewCoordinate({
-            pitch: p,
-            yaw: y
-          })
-        }}
+
+        onMouseup={handleMouseUp}
+        onMousedown={handleMouseDown}
+        onRender={handleSubscribe}
       >
-        <Pannellum.Hotspot
-          type="info" // custom for move to target scene, info for information
-          pitch={0.109}
-          yaw={159.037}
-          text="Info Hotspot Text 4"
-          handleClick={() => alert(123)} // handle click hanya untuk type custom
-        />
+        {currentScene?.hotSpots.map((hotspot, i) => (
+          <Pannellum.Hotspot
+            key={i}
+            type={hotspot.type}
+            text={hotspot.text}
+            pitch={hotspot.pitch}
+            yaw={hotspot.yaw}
+          />
+        ))}
+
       </Pannellum>
     </div>
   )
 }
 
+
+{/* <div
+// style={{
+//   left: 5.959540473090278,
+//   top: 
+// }}
+className='absolute z-[1200] h-[50px] w-[50px] bg-white rounded-md'
+onMouseDown={handleMouseDownItem}
+onMouseUp={handleMouseUpItem}
+>
+
+</div> */}
+
+// <div className='absolute z-[100000000] top-0'>
+//     <div className='text-[80px] text-white cursor-grab'>
+//       hello gyus
+//     </div>
+//   </div>
 
 
 {/* <div className='absolute text-[80px] z-[1000] top-0 text-white cursor-grab'>

@@ -1,13 +1,14 @@
 import React from 'react'
 import * as Recoil from 'recoil'
-import { useNavigate } from 'react-router-dom'
-import { scene, sceneMenu } from '@/store/scene'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { scene, viewerCoordinate, initialViewerCoordinate } from '@/store/scene'
 import { HiInformationCircle } from 'react-icons/hi'
 import { IoIosArrowDropupCircle, IoMdAdd } from 'react-icons/io'
 import { FaRegEye } from 'react-icons/fa'
 import { PiPaperPlaneTiltFill } from 'react-icons/pi'
 import { cn } from '@/utils/clsx'
 import { ModalAddRuangan } from '../modal/modal-add-ruangan'
+import { uuid } from '@/utils/uuid'
 
 const modalState = {
   addRuangan: false
@@ -21,17 +22,19 @@ export const SideEditor = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const [query] = useSearchParams()
+
   const navigate = useNavigate()
 
   const [tourName, setTourName] = React.useState('untitled')
 
   const [modal, setModal] = React.useState<typeof modalState>(modalState)
 
-  const sceneAtom = Recoil.useRecoilValue(scene)
+  const [sceneAtom, setSceneAtom] = Recoil.useRecoilState(scene)
 
-  const [sceneMenuAtom, setSceneMenuAtom] = Recoil.useRecoilState(sceneMenu)
+  const setInitialViewerCoordinate = Recoil.useSetRecoilState(initialViewerCoordinate)
 
-  console.log(sceneMenuAtom)
+  const viewerCoordinateAtom = Recoil.useRecoilValue(viewerCoordinate)
 
   const moveToTargetScene = (id: string) =>
     () => navigate(`/editor/?sceneId=${id}`)
@@ -48,7 +51,29 @@ export const SideEditor = () => {
 
   const handleSceneMenuType = (type: 'custom' | 'info') =>
     () => {
-      setSceneMenuAtom(type)
+      setSceneAtom(prev => {
+        return prev.map((scene) =>
+          scene.id === query.get('sceneId') ? {
+            ...scene,
+            hotSpots: [...scene.hotSpots,
+            {
+              id: uuid(),
+              pitch: viewerCoordinateAtom.pitch,
+              yaw: viewerCoordinateAtom.yaw,
+              type: type,
+              text: type === 'info' ? 'Hallo guys' : undefined
+            }]
+          } : scene
+        )
+      })
+
+      // set pannellum view coordinate
+      setInitialViewerCoordinate({
+        pitch: viewerCoordinateAtom.pitch,
+        yaw: viewerCoordinateAtom.yaw
+      })
+
+
     }
 
   const onCloseModal = React.useCallback(() => setModal(modalState), [])
@@ -66,9 +91,7 @@ export const SideEditor = () => {
             <div className='mt-2 flex flex-col gap-[3px]' aria-label="btn-action-contianer">
               <button
                 className={cn(
-                  'flex items-center gap-3 px-5 w-full py-[10px]',
-                  sceneMenuAtom === 'info' ? ' bg-gray-500' : ' bg-gray-700'
-
+                  'flex items-center gap-3 px-5 w-full py-[10px] bg-gray-700'
                 )}
                 type="button"
                 onClick={handleSceneMenuType('info')}
@@ -78,8 +101,7 @@ export const SideEditor = () => {
               </button>
               <button
                 className={cn(
-                  'flex items-center gap-3 px-5 w-full py-[10px] bg-gray-700',
-                  sceneMenuAtom === 'custom' ? ' bg-gray-500' : ' bg-gray-700'
+                  'flex items-center gap-3 px-5 w-full py-[10px] bg-gray-700'
                 )}
                 type="button"
                 onClick={handleSceneMenuType('custom')}
