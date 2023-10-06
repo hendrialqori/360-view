@@ -10,7 +10,9 @@ export type Scene = {
     pitch: number;
     yaw: number;
     targetSceneId?: string;
-    text?: string;
     type: 'custom' | 'info' // custom for move scene and info for show information
+    text?: string;
+    typeDev?: 'custom'
+    cssClass?: string
   }[]
 }

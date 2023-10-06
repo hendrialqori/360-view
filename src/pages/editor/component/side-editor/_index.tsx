@@ -1,14 +1,20 @@
 import React from 'react'
 import * as Recoil from 'recoil'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { scene, viewerCoordinate, initialViewerCoordinate } from '@/store/scene'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { viewerCoordinate, initialViewerCoordinate } from '@/store/scene'
 import { HiInformationCircle } from 'react-icons/hi'
 import { IoIosArrowDropupCircle, IoMdAdd } from 'react-icons/io'
 import { FaRegEye } from 'react-icons/fa'
 import { PiPaperPlaneTiltFill } from 'react-icons/pi'
 import { cn } from '@/utils/clsx'
 import { ModalAddRuangan } from '../modal/modal-add-ruangan'
-import { uuid } from '@/utils/uuid'
+import {
+  useGetTourRooms,
+  // useUpdateTour
+} from '@/api/services/tour';
+import { useCreateHostpot } from '@/api/services/hostspot'
+import { successToaster } from '@/components/toaster/success-toaster'
+import { errorToaster } from '@/components/toaster/error-toaster'
 
 const modalState = {
   addRuangan: false
@@ -16,13 +22,19 @@ const modalState = {
 
 export const SideEditor = () => {
 
-  React.useEffect(() => {
-    // reset pathname
-    navigate('/editor')
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   const [query] = useSearchParams()
+
+  const { idTour } = useParams()
+
+  const { data: rooms } = useGetTourRooms({ id: Number(idTour) })
+
+  // const { mutate: updateTour, status: updateTourStatus } = useUpdateTour()
+
+  const { mutate: createHotspot } = useCreateHostpot()
+
+  const roomsMemoize = React.useMemo(() => {
+    return rooms?.data
+  }, [rooms?.data])
 
   const navigate = useNavigate()
 
@@ -30,14 +42,12 @@ export const SideEditor = () => {
 
   const [modal, setModal] = React.useState<typeof modalState>(modalState)
 
-  const [sceneAtom, setSceneAtom] = Recoil.useRecoilState(scene)
-
   const setInitialViewerCoordinate = Recoil.useSetRecoilState(initialViewerCoordinate)
 
   const viewerCoordinateAtom = Recoil.useRecoilValue(viewerCoordinate)
 
   const moveToTargetScene = (id: string) =>
-    () => navigate(`/editor/?sceneId=${id}`)
+    () => navigate(`/editor/${idTour}?roomId=${id}`)
 
   const handleShowModal = React.useCallback((type: keyof typeof modalState) =>
     () => {
@@ -51,29 +61,28 @@ export const SideEditor = () => {
 
   const handleSceneMenuType = (type: 'custom' | 'info') =>
     () => {
-      setSceneAtom(prev => {
-        return prev.map((scene) =>
-          scene.id === query.get('sceneId') ? {
-            ...scene,
-            hotSpots: [...scene.hotSpots,
-            {
-              id: uuid(),
-              pitch: viewerCoordinateAtom.pitch,
-              yaw: viewerCoordinateAtom.yaw,
-              type: type,
-              text: type === 'info' ? 'Hallo guys' : undefined
-            }]
-          } : scene
-        )
-      })
-
+      createHotspot(
+        {
+          pitch: viewerCoordinateAtom.pitch,
+          yaw: viewerCoordinateAtom.yaw,
+          type: type,
+          tour_id: Number(idTour),
+          room_id: Number(query.get('roomId'))
+        },
+        {
+          onSuccess: () => {
+            successToaster({ message: 'Berhasil menambah hotspot' })
+          },
+          onError: () => {
+            errorToaster({ message: 'Gagal menambah hotspot' })
+          }
+        }
+      )
       // set pannellum view coordinate
       setInitialViewerCoordinate({
         pitch: viewerCoordinateAtom.pitch,
         yaw: viewerCoordinateAtom.yaw
       })
-
-
     }
 
   const onCloseModal = React.useCallback(() => setModal(modalState), [])
@@ -130,15 +139,15 @@ export const SideEditor = () => {
             </header>
             <div className='max-h-[300px] overflow-auto mt-2' aria-label='list-ruangan-container'>
               <div className='text-white flex flex-col gap-[3px]' aria-label='list-ruangan-wrapper'>
-                {sceneAtom?.map((scene, i) => (
+                {roomsMemoize?.map((room, i) => (
                   <button
                     key={i}
                     className='flex items-center gap-3 px-5 w-full py-3 bg-gray-700'
                     type="button"
-                    onClick={moveToTargetScene(scene.id)}
+                    onClick={moveToTargetScene(room.id as unknown as string)}
                   >
                     <PiPaperPlaneTiltFill className="text-xl" />
-                    <p className='text-[.85rem]'>{scene.name}</p>
+                    <p className='text-[.85rem]'>{room.name}</p>
                   </button>
                 ))}
               </div>

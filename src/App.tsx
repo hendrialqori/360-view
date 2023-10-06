@@ -9,7 +9,7 @@ function App() {
         <Routes>
           <Route path="/">
             <Route index element={<Pages.Home />} />
-            <Route path="editor" index element={<Pages.Editor />} />
+            <Route path="editor/:idTour" element={<Pages.Editor />} />
           </Route>
         </Routes>
       </BrowserRouter>

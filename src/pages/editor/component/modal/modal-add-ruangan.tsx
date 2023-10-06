@@ -1,53 +1,57 @@
 import React from 'react'
-import * as Recoil from 'recoil'
-import { scene } from '@/store/scene'
-import { uuid } from '@/utils/uuid'
 import { Modal } from "@/components/modal/_index"
 import { AiOutlineClose } from 'react-icons/ai'
-import { imageGallery } from '@/data/image-gallery'
 import { cn } from '@/utils/clsx'
 import { BiCheck } from 'react-icons/bi'
-
+import { useCreateRoom } from '@/api/services/room'
+import { useGetImages } from '@/api/services/image'
+import { useParams } from 'react-router-dom'
+import { successToaster } from '@/components/toaster/success-toaster'
+import { errorToaster } from '@/components/toaster/error-toaster'
 
 type Props = {
   isShow: boolean;
   onClose: () => void;
 }
 
+const ORIGIN = import.meta.env.VITE_ORIGIN;
+
 export const ModalAddRuangan = ({ isShow, onClose }: Props) => {
 
-  const [sceneAtom, setSceneAtom] = Recoil.useRecoilState(scene)
+  const { idTour } = useParams()
 
-  const [sceneName, setSceneName] = React.useState(() => {
-    return `RUANGAN-${sceneAtom.length + 1}`
-  })
+  const { data: images } = useGetImages()
 
-  React.useEffect(() => {
-    setSceneName(`RUANGAN-${sceneAtom.length + 1}`)
-  }, [sceneAtom.length])
+  const { mutate: createRoom, status: createRoomStatus } = useCreateRoom()
+
+  const [roomName, setRoomName] = React.useState('Ruangan')
 
   const [imageUrl, setImageUrl] = React.useState<string | null>(null)
 
   const pickImageUrl = (image: string) => () => setImageUrl(image)
 
-  const addNewScene = () => {
-    setSceneAtom(prev => [
-      ...prev,
-      {
-        id: uuid(),
-        name: sceneName,
-        image: imageUrl as string,
-        slug: '',
-        hotSpots: []
-      }
-    ])
-
-    closeModal()
-  }
-
   const closeModal = () => {
     onClose()
     setImageUrl(null)
+  }
+
+  const handleCreateRoom = () => {
+    createRoom(
+      {
+        image_url: imageUrl as string,
+        name: roomName,
+        tour_id: Number(idTour)
+      },
+      {
+        onSuccess: () => {
+          successToaster({ message: 'Behasil membuat room baru' })
+          closeModal()
+        },
+        onError: () => {
+          errorToaster({ message: 'Gagal membuat room baru' })
+        }
+      }
+    )
   }
 
   return (
@@ -64,20 +68,22 @@ export const ModalAddRuangan = ({ isShow, onClose }: Props) => {
           <div className='max-h-[330px] overflow-auto' aria-label='images-container'>
             <div className='grid grid-cols-2 gap-3 pr-2' aria-label='images-wrapper'>
               {
-                imageGallery.map((image, i) => (
+                images?.data?.map((image, i) => (
                   <div
                     key={i}
                     className={cn(
                       'col-span-1 cursor-pointer relative',
 
                     )}
-                    onClick={pickImageUrl(image.url)}
+                    onClick={pickImageUrl(image.file_path as string)}
                   >
                     <img
-                      src={image.url}
+                      src={ORIGIN + image?.file_path}
+                      alt='avatar'
+                      loading='lazy'
                     />
                     {
-                      imageUrl === image.url &&
+                      imageUrl === image.file_path &&
                       (
                         <div
                           className='absolute inset-0 bg-black/60 z-10 flex justify-center items-center'
@@ -107,16 +113,17 @@ export const ModalAddRuangan = ({ isShow, onClose }: Props) => {
                   'placeholder:font-medium placeholder:tracking-wide placeholder:text-gray-400',
                   'peer/search'
                 )}
-                value={sceneName}
-                onChange={(e) => setSceneName(e.target.value)}
+                value={roomName}
+                onChange={(e) => setRoomName(e.target.value)}
               />
             </div>
             <button
+              disabled={createRoomStatus === 'loading'}
               type='button'
-              onClick={addNewScene}
+              onClick={handleCreateRoom}
               className="bg-blue-500 relative text-white w-full px-3 py-2 rounded-md font-medium mt-4"
             >
-              Simpan
+              {createRoomStatus === 'loading' ? 'Loading...' : ' Simpan'}
             </button>
           </div>
         </div>

@@ -7,7 +7,10 @@ import { type Image } from "@/types/image";
 import { AiOutlineClose } from 'react-icons/ai'
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
-import { uuid } from '@/utils/uuid';
+import { formatBytes } from '@/utils/formatBytes';
+import { useCreateTour } from '@/api/services/tour';
+import { useCreateRoom } from '@/api/services/room';
+import { errorToaster } from '@/components/toaster/error-toaster';
 
 type Props = {
   isShow: boolean;
@@ -15,25 +18,56 @@ type Props = {
   onClose: () => void
 }
 
+const ORIGIN = import.meta.env.VITE_ORIGIN;
+
 export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
+
+  const { mutate: createTour, status: statusCreateTour } = useCreateTour()
+
+  const { mutate: createRoom, status: statusCreateRoom } = useCreateRoom()
 
   const navigate = useNavigate()
 
   const [sceneAtom, setSceneAtom] = Recoil.useRecoilState(scene)
 
-  const addNewScene = () => {
-    setSceneAtom(prev => [
-      ...prev,
+  const createRoomAction = ({ tour_id }: { tour_id: number }) => {
+    createRoom({
+      name: 'Ruangan',
+      image_url: image?.file_path as string,
+      tour_id: tour_id
+    },
       {
-        id: uuid(),
-        name: `RUANGAN-${sceneAtom.length + 1}`,
-        image: image?.url as string,
-        slug: '',
-        hotSpots: []
-      }
-    ])
+        onSuccess: (data) => {
+          navigate(`/editor/${tour_id}?roomId=${data.data.id}`)
+        },
+        onError: () => {
+          errorToaster({ message: 'Gagal mmembuat room' })
+        }
+      })
+  }
 
-    navigate('/editor')
+  const addNewScene = () => {
+    // setSceneAtom(prev => [
+    //   ...prev,
+    //   {
+    //     id: uuid(),
+    //     name: `RUANGAN-${sceneAtom.length + 1}`,
+    //     image: image?.url as string,
+    //     slug: '',
+    //     hotSpots: []
+    //   }
+    // ])
+
+    createTour({ name: 'Untitled' },
+      {
+        onSuccess: (data) => {
+          createRoomAction({ tour_id: data.data.id })
+        },
+        onError: () => {
+          errorToaster({ message: 'Gagal mmembuat tour' })
+        }
+      }
+    )
   }
 
   return (
@@ -47,7 +81,7 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
         <div className="flex gap-3 px-5 pt-5 pb-9" aria-label="modal-body">
           <div className="w-8/12" aria-label="image-wrapper">
             <LazyLoadImage
-              src={image?.url}
+              src={ORIGIN + image?.file_path}
               effect="blur"
               alt="360-image-preview"
             />
@@ -60,14 +94,17 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
             </div>
             <div className="mt-2 text-[.9rem]">
               <p className="text-gray-500">size</p>
-              <p className="font-medium">{image?.size} MB</p>
+              <p className="font-medium">{formatBytes(image?.file_size as number)}</p>
             </div>
             <div className="flex justify-end mt-auto mb-0">
               <button
                 className="bg-blue-500 relative text-white w-max px-3 py-2 rounded-md font-medium"
                 onClick={addNewScene}
               >
-                Create tour
+                {
+                  statusCreateTour === 'loading' ||
+                    statusCreateRoom === 'loading' ? 'Loading..' : 'Create tour'
+                }
               </button>
             </div>
           </div>
