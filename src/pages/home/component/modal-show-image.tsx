@@ -1,5 +1,3 @@
-import * as Recoil from 'recoil'
-import { scene } from '@/store/scene';
 import { Modal } from "@/components/modal/_index";
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
@@ -28,8 +26,6 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
 
   const navigate = useNavigate()
 
-  const [sceneAtom, setSceneAtom] = Recoil.useRecoilState(scene)
-
   const createRoomAction = ({ tour_id }: { tour_id: number }) => {
     createRoom({
       name: 'Ruangan',
@@ -47,17 +43,6 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
   }
 
   const addNewScene = () => {
-    // setSceneAtom(prev => [
-    //   ...prev,
-    //   {
-    //     id: uuid(),
-    //     name: `RUANGAN-${sceneAtom.length + 1}`,
-    //     image: image?.url as string,
-    //     slug: '',
-    //     hotSpots: []
-    //   }
-    // ])
-
     createTour({ name: 'Untitled' },
       {
         onSuccess: (data) => {

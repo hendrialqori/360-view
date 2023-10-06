@@ -1,9 +1,6 @@
 import React from 'react'
-import * as Recoil from 'recoil'
 import { BsFillTrash3Fill } from 'react-icons/bs'
-import { useSearchParams } from 'react-router-dom';
-import { scene } from '@/store/scene';
-import { useDeleteHotspot, useUpdateHotspot } from '@/api/services/hostspot';
+import { useUpdateHotspot } from '@/api/services/hostspot';
 import { successToaster } from '@/components/toaster/success-toaster';
 import { errorToaster } from '@/components/toaster/error-toaster';
 
@@ -17,11 +14,7 @@ type Props = {
 
 export const ModalInfo = ({ hotspotInfoId, text, coordinateX, coordinateY, onClose }: Props) => {
 
-  const [query] = useSearchParams()
-
   const { mutate: updateHostpot } = useUpdateHotspot()
-
-  const [sceneAtom, setSceneAtom] = Recoil.useRecoilState(scene)
 
   const [information, setInformation] = React.useState(text)
 
@@ -29,45 +22,6 @@ export const ModalInfo = ({ hotspotInfoId, text, coordinateX, coordinateY, onClo
     setInformation(text)
   }, [text])
 
-  const hostspotText = React.useMemo(() => {
-    const temp = sceneAtom.find((scene) => scene.id === query.get('sceneId'))
-
-    const hostpot = temp?.hotSpots.find((hp) => hp.id === hotspotInfoId)
-
-    return hostpot?.text
-
-  }, [hotspotInfoId, query, sceneAtom])
-
-
-  const handleDelete = () => {
-    const ask = confirm('Yakin menghapus ?')
-
-    if (ask) {
-      setSceneAtom(prev => {
-        return prev.map((scene => ({
-          ...scene,
-          hotSpots: scene.hotSpots.filter((hp) => hp.id !== hotspotInfoId)
-        })))
-      })
-      onClose()
-    }
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // setInfoText(e.target.value)
-
-    setSceneAtom(prev => {
-      return prev.map((scene => ({
-        ...scene,
-        hotSpots: scene.hotSpots.map((hp) =>
-          hp.id === hotspotInfoId ? {
-            ...hp,
-            text: e.target.value
-          } : hp
-        )
-      })))
-    })
-  }
 
   const handleUpdateHotspot = () => {
 
@@ -124,7 +78,6 @@ export const ModalInfo = ({ hotspotInfoId, text, coordinateX, coordinateY, onClo
           <button
             type='button'
             className='w-max'
-            onClick={handleDelete}
           >
             <BsFillTrash3Fill className="text-xl" />
           </button>
