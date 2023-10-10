@@ -13,7 +13,7 @@ function App() {
           <Route path="/">
             <Route index element={<Pages.Home />} />
             <Route path="tour/:idTour" element={<Pages.Tour />} />
-            <Route path="tours" element={<Pages.Tours />} />
+            <Route path="list-tour" element={<Pages.Tours />} />
             <Route path="editor/:idTour" element={<Pages.Editor />} />
           </Route>
         </Routes>

@@ -13,7 +13,7 @@ export const useGetTour = ({ tour_id }: { tour_id: number }) => {
   }
 
   return useQuery<Awaited<ReturnType<typeof GET>>, AxiosError<ErrorResponse>>({
-    queryKey: ['TOURS'],
+    queryKey: ['TOUR'],
     queryFn: async () => GET(),
   })
 }
