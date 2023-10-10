@@ -9,12 +9,15 @@ import { PiPaperPlaneTiltFill } from 'react-icons/pi'
 import { cn } from '@/utils/clsx'
 import { ModalAddRuangan } from '../modal/modal-add-ruangan'
 import {
+  useGetTour,
   useGetTourRooms,
+  useUpdateTour,
   // useUpdateTour
 } from '@/api/services/tour';
 import { useCreateHostpot } from '@/api/services/hostspot'
 import { successToaster } from '@/components/toaster/success-toaster'
 import { errorToaster } from '@/components/toaster/error-toaster'
+import PulseLoader from 'react-spinners/PulseLoader'
 
 const modalState = {
   addRuangan: false
@@ -26,9 +29,15 @@ export const SideEditor = () => {
 
   const { idTour } = useParams()
 
+  const navigate = useNavigate()
+
+  const idRoom = query.get('roomId')
+
+  const { data: tour } = useGetTour({ tour_id: Number(idTour) })
+
   const { data: rooms } = useGetTourRooms({ id: Number(idTour) })
 
-  // const { mutate: updateTour, status: updateTourStatus } = useUpdateTour()
+  const { mutate: updateTour, status: updateTourStatus } = useUpdateTour()
 
   const { mutate: createHotspot } = useCreateHostpot()
 
@@ -36,15 +45,18 @@ export const SideEditor = () => {
     return rooms?.data
   }, [rooms?.data])
 
-  const navigate = useNavigate()
 
-  const [tourName, setTourName] = React.useState('untitled')
+  const [tourName, setTourName] = React.useState('')
 
   const [modal, setModal] = React.useState<typeof modalState>(modalState)
 
   const setInitialViewerCoordinate = Recoil.useSetRecoilState(initialViewerCoordinate)
 
   const viewerCoordinateAtom = Recoil.useRecoilValue(viewerCoordinate)
+
+  React.useEffect(() => {
+    setTourName(tour?.data.name as string)
+  }, [tour?.data.name])
 
   const moveToTargetScene = (id: string) =>
     () => navigate(`/editor/${idTour}?roomId=${id}`)
@@ -67,7 +79,7 @@ export const SideEditor = () => {
           yaw: viewerCoordinateAtom.yaw,
           type: type,
           tour_id: Number(idTour),
-          room_id: Number(query.get('roomId'))
+          room_id: Number(idRoom)
         },
         {
           onSuccess: () => {
@@ -85,6 +97,23 @@ export const SideEditor = () => {
       })
     }
 
+  const handleUpdateTourName = () => {
+    updateTour(
+      {
+        tour_id: Number(idTour),
+        name: tourName
+      },
+      {
+        onSuccess: () => {
+          successToaster({ message: "Success update tour" })
+        },
+        onError: () => {
+          errorToaster({ message: 'Failed update tour' })
+        }
+      }
+    )
+  }
+
   const onCloseModal = React.useCallback(() => setModal(modalState), [])
 
   return (
@@ -100,7 +129,7 @@ export const SideEditor = () => {
             <div className='mt-2 flex flex-col gap-[3px]' aria-label="btn-action-contianer">
               <button
                 className={cn(
-                  'flex items-center gap-3 px-5 w-full py-[10px] bg-gray-700'
+                  'flex items-center gap-3 px-5 w-full py-[10px] bg-gray-700 hover:bg-gray-600 transition'
                 )}
                 type="button"
                 onClick={handleSceneMenuType('info')}
@@ -110,7 +139,7 @@ export const SideEditor = () => {
               </button>
               <button
                 className={cn(
-                  'flex items-center gap-3 px-5 w-full py-[10px] bg-gray-700'
+                  'flex items-center gap-3 px-5 w-full py-[10px] bg-gray-700 hover:bg-gray-600 transition'
                 )}
                 type="button"
                 onClick={handleSceneMenuType('custom')}
@@ -142,12 +171,15 @@ export const SideEditor = () => {
                 {roomsMemoize?.map((room, i) => (
                   <button
                     key={i}
-                    className='flex items-center gap-3 px-5 w-full py-3 bg-gray-700'
+                    className={cn(
+                      'flex items-center gap-3 px-5 w-full py-3',
+                      Number(idRoom) === room.id ? 'bg-gray-600' : 'bg-gray-700'
+                    )}
                     type="button"
                     onClick={moveToTargetScene(room.id as unknown as string)}
                   >
                     <PiPaperPlaneTiltFill className="text-xl" />
-                    <p className='text-[.85rem]'>{room.name}</p>
+                    <p className='text-[.9rem]'>{room.name}</p>
                   </button>
                 ))}
               </div>
@@ -171,9 +203,11 @@ export const SideEditor = () => {
             />
           </div>
           <button
+            onClick={handleUpdateTourName}
+            disabled={updateTourStatus === 'loading'}
             className="bg-blue-500 relative text-white w-full px-3 py-2 rounded-md font-medium mt-4"
           >
-            Simpan
+            {updateTourStatus === 'loading' ? <PulseLoader color='white' size={10} /> : 'Simpan'}
           </button>
         </div>
       </div>

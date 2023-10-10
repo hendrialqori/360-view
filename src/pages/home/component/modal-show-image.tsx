@@ -27,6 +27,7 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
   const navigate = useNavigate()
 
   const createRoomAction = ({ tour_id }: { tour_id: number }) => {
+    
     createRoom({
       name: 'Ruangan',
       image_url: image?.file_path as string,
@@ -83,12 +84,12 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
             </div>
             <div className="flex justify-end mt-auto mb-0">
               <button
-                className="bg-blue-500 relative text-white w-max px-3 py-2 rounded-md font-medium"
+                className="bg-blue-500 relative text-white w-max px-3 py-2 rounded-md font-medium text-[.8rem] tracking-wide"
                 onClick={addNewScene}
               >
                 {
                   statusCreateTour === 'loading' ||
-                    statusCreateRoom === 'loading' ? 'Loading..' : 'Create tour'
+                    statusCreateRoom === 'loading' ? 'Loading..' : 'CREATE TOUR'
                 }
               </button>
             </div>

@@ -4,6 +4,7 @@ import { AxiosError } from 'axios';
 import { type Image } from '@/types/image'
 import { useQuery } from '@tanstack/react-query';
 
+const intervalMs = import.meta.env.VITE_FETCH_INTERVAL
 
 export const useGetImages = () => {
   const GET = async (): Promise<SuccessResponse<Image[]> | undefined> => {
@@ -14,6 +15,7 @@ export const useGetImages = () => {
   return useQuery<Awaited<ReturnType<typeof GET>>, AxiosError<ErrorResponse>>({
     queryKey: ['IMAGES'],
     queryFn: async () => GET(),
+    refetchInterval: Number(intervalMs)
   })
 
 }

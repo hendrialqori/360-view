@@ -10,10 +10,11 @@ import { ModalInfo } from '../modal/modal.info';
 import { Pannellum } from "pannellum-react";
 import { ModalCustom } from '../modal/modal-custom';
 import { useGetRoom, useGetRoomHotspots } from '@/api/services/room';
+import { Hotspot } from '@/types/hotspot';
 
 const ORIGIN = import.meta.env.VITE_ORIGIN;
 
-export const SceneEditor = () => {
+export const RoomEditor = () => {
 
   const [query] = useSearchParams()
 
@@ -21,7 +22,7 @@ export const SceneEditor = () => {
 
   const { data: hostspots } = useGetRoomHotspots({ id: String(query.get('roomId')) })
 
-  const viewRef = React.useRef<any | null>(null);
+  const panoramaRef = React.useRef<any | null>(null);
 
   const initialViewerCoordinateAtom = Recoil.useRecoilValue(initialViewerCoordinate)
 
@@ -30,10 +31,6 @@ export const SceneEditor = () => {
   const [modal, setModal] = React.useState<'custom' | 'info' | null>(null)
 
   const [hotspotId, setHotspotId] = React.useState<string | null>(null)
-
-  const [hotspotText, setHotspotText] = React.useState('')
-
-  const [hotspotRoomTargetId, setHostpotRoomTargetId] = React.useState<number | null>(null)
 
   const [pointer, setPointer] = React.useState({
     x: 0,
@@ -47,31 +44,33 @@ export const SceneEditor = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room?.data, query.get('roomId')])
 
-  const handleShowModal = ({ type, id, text, roomTargetId }:
-    { type: typeof modal; id: string, text: string, roomTargetId: number }) =>
+  const currentHotspot = React.useMemo(() => {
+    const temp = hostspots?.data.find((hotspot) =>
+      hotspot.id === Number(hotspotId)
+    )
+
+    return temp
+  }, [hostspots?.data, hotspotId])
+
+  const handleShowModal = ({ type, id }:
+    { type: typeof modal; id: string }) =>
     () => {
       setModal(type)
       setHotspotId(id)
-      setHotspotText(text)
-      setHostpotRoomTargetId(roomTargetId)
 
     }
 
   const handleCloseModal = React.useCallback(() => {
     setModal(null)
     setHotspotId(null)
-    setHotspotText('')
-    // setHostpotRoomTargetId(null)
+    
 
   }, [])
-
-
 
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault()
 
-    // if (!isOpenPopUp) {
     setPointer({
       x: e.clientX,
       y: e.clientY,
@@ -79,10 +78,9 @@ export const SceneEditor = () => {
   }
 
   const handleSubscribe = () => {
-    const pitch = viewRef?.current?.getViewer()?.getPitch()
-    const yaw = viewRef?.current?.getViewer()?.getYaw()
+    const pitch = panoramaRef?.current?.getViewer()?.getPitch()
+    const yaw = panoramaRef?.current?.getViewer()?.getYaw()
     setViewerCoordinatAtom({ pitch, yaw })
-    handleCloseModal()
   }
 
 
@@ -92,11 +90,12 @@ export const SceneEditor = () => {
       onClick={handleMouseDown}
     >
       <Pannellum
-        ref={viewRef}
+        ref={panoramaRef}
         title={currentScene?.name}
         width="100%"
         height="90vh"
         image={statusRoom === 'success' ? ORIGIN + currentScene?.image_url : ''}
+        // image={'/images/5.jpeg'}
         autoLoad={true}
         hfov={100}
         haov={360}
@@ -114,12 +113,11 @@ export const SceneEditor = () => {
             type={'custom'}
             pitch={hotspot?.pitch}
             yaw={hotspot?.yaw}
+            autoRotate={0}
             cssClass={hotspot.type == 'info' ? 'info-custom-style' : ''}
             handleClick={handleShowModal({
               id: String(hotspot?.id),
-              type: hotspot?.type,
-              text: hotspot.text as string,
-              roomTargetId: Number(hotspot.room_link_id)
+              type: hotspot?.type
             })}
           />
         ))}
@@ -127,20 +125,20 @@ export const SceneEditor = () => {
 
       {modal === 'info' && hotspotId && (
         <ModalInfo
-          hotspotInfoId={hotspotId}
-          text={hotspotText}
+          hotspot={currentHotspot as Hotspot}
           coordinateX={pointer.x}
           coordinateY={pointer.y}
+          forceRenderPanorana={() => panoramaRef.current.forceRender()}
           onClose={handleCloseModal}
         />
       )}
 
       {modal === 'custom' && hotspotId && (
         <ModalCustom
-          hotspotCustomId={hotspotId}
-          hotspotRoomTargetId={hotspotRoomTargetId}
+          hotspot={currentHotspot as Hotspot}
           coordinateX={pointer.x}
           coordinateY={pointer.y}
+          forceRenderPanorana={() => panoramaRef.current.forceRender()}
           onClose={handleCloseModal}
         />
       )}
@@ -193,15 +191,15 @@ onMouseUp={handleMouseUpItem}
       hello gyus
 </div> */}
 
-  // const handleMouseDown = () => {
-  //   // console.log({
-  //   //   pitch: viewRef?.current?.panorama?.getPitch(),
-  //   //   yaw: viewRef?.current?.panorama?.getYaw()
-  //   // })
-  //   const p = viewRef?.current?.getViewer()?.mouseEventToCoords(event)[0] as number
-  //   const y = viewRef?.current?.getViewer()?.mouseEventToCoords(event)[1] as number
-  //   setViewCoordinate({
-  //     pitch: p,
-  //     yaw: y
-  //   })
-  // }
+// const handleMouseDown = () => {
+//   // console.log({
+//   //   pitch: viewRef?.current?.panorama?.getPitch(),
+//   //   yaw: viewRef?.current?.panorama?.getYaw()
+//   // })
+//   const p = viewRef?.current?.getViewer()?.mouseEventToCoords(event)[0] as number
+//   const y = viewRef?.current?.getViewer()?.mouseEventToCoords(event)[1] as number
+//   setViewCoordinate({
+//     pitch: p,
+//     yaw: y
+//   })
+// }

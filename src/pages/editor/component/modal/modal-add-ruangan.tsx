@@ -8,6 +8,7 @@ import { useGetImages } from '@/api/services/image'
 import { useParams } from 'react-router-dom'
 import { successToaster } from '@/components/toaster/success-toaster'
 import { errorToaster } from '@/components/toaster/error-toaster'
+import PulseLoader from 'react-spinners/PulseLoader'
 
 type Props = {
   isShow: boolean;
@@ -36,6 +37,11 @@ export const ModalAddRuangan = ({ isShow, onClose }: Props) => {
   }
 
   const handleCreateRoom = () => {
+    if (!imageUrl) {
+      errorToaster({ message: 'Silahkan pilih gambar dahulu' })
+      return
+    }
+
     createRoom(
       {
         image_url: imageUrl as string,
@@ -44,11 +50,13 @@ export const ModalAddRuangan = ({ isShow, onClose }: Props) => {
       },
       {
         onSuccess: () => {
-          successToaster({ message: 'Behasil membuat room baru' })
+          successToaster({ message: 'Behasil membuat ruangan baru' })
+          setRoomName('Ruangan')
+          setImageUrl(null)
           closeModal()
         },
         onError: () => {
-          errorToaster({ message: 'Gagal membuat room baru' })
+          errorToaster({ message: 'Gagal membuat ruangan' })
         }
       }
     )
@@ -60,7 +68,11 @@ export const ModalAddRuangan = ({ isShow, onClose }: Props) => {
     >
       <div className="bg-white rounded-sm px-4 w-5/12">
         <header className="flex justify-end pt-3" aria-label="modal-head">
-          <button type="button" onClick={closeModal}>
+          <button
+            disabled={createRoomStatus === 'loading'}
+            type="button"
+            onClick={closeModal}
+          >
             <AiOutlineClose className="text-lg" />
           </button>
         </header>
@@ -123,7 +135,7 @@ export const ModalAddRuangan = ({ isShow, onClose }: Props) => {
               onClick={handleCreateRoom}
               className="bg-blue-500 relative text-white w-full px-3 py-2 rounded-md font-medium mt-4"
             >
-              {createRoomStatus === 'loading' ? 'Loading...' : ' Simpan'}
+              {createRoomStatus === 'loading' ? <PulseLoader color='white' size={10} /> : 'Simpan'}
             </button>
           </div>
         </div>

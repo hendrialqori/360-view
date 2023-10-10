@@ -19,16 +19,21 @@ export const Galleries = React.memo(({ onClickImage }: Props) => {
 
   return (
     <div className={cn(
-      'mx-auto w-10/12 mt-10',
+      'mx-5 mt-10',
       'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2',
       'justify-items-center'
     )}>
       {images?.data.map((image, i) => (
-        <div key={i} className='overflow-hidden cursor-pointer' onClick={() => onClickImage(image)}>
+        <div
+          key={i}
+          className='overflow-hidden cursor-pointer border rounded-md'
+          onClick={() => onClickImage(image)}
+        >
           <LazyLoadImage
             src={ORIGIN + image?.file_path}
+            // src='/images/5.jpeg'
             alt='image-view'
-            className='object-fill h-[350px] aspect-square'
+            className='object-fill h-[390px] aspect-square'
             effect='blur'
           />
         </div>

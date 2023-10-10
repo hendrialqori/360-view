@@ -2,7 +2,34 @@ import { ErrorResponse, SuccessResponse } from '@/types/global';
 import { Axios } from '../axios'
 import { AxiosError } from 'axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { type Tour } from '@/types/tour';
 import { type Room } from '@/types/room';
+
+export const useGetTour = ({ tour_id }: { tour_id: number }) => {
+
+  const GET = async (): Promise<SuccessResponse<Tour> | undefined> => {
+    const req = await Axios.get(`/api/tour/${tour_id}`)
+    return req.data
+  }
+
+  return useQuery<Awaited<ReturnType<typeof GET>>, AxiosError<ErrorResponse>>({
+    queryKey: ['TOURS'],
+    queryFn: async () => GET(),
+  })
+}
+
+export const useGetTours = () => {
+
+  const GET = async (): Promise<SuccessResponse<Tour[]> | undefined> => {
+    const req = await Axios.get(`/api/tours`)
+    return req.data
+  }
+
+  return useQuery<Awaited<ReturnType<typeof GET>>, AxiosError<ErrorResponse>>({
+    queryKey: ['TOURS'],
+    queryFn: async () => GET(),
+  })
+}
 
 export const useGetTourRooms = ({ id }: { id: number }) => {
   const GET = async (): Promise<SuccessResponse<Room[]> | undefined> => {
