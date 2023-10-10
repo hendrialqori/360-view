@@ -54,6 +54,9 @@ export const TableData: React.FC<Props> = ({ data }) => {
       setSortBy(baseOn)
     }
 
+  const navigateToTour = (id: number) =>
+    () => navigate(`/tour/${id}`)
+
   const navigateToEditor = (id: number) =>
     () => navigate(`/editor/${id}`)
 
@@ -101,6 +104,7 @@ export const TableData: React.FC<Props> = ({ data }) => {
                       'hover:bg-blue-600 hover:text-white'
                     )}
                     type="button"
+                    onClick={navigateToTour(item.id)}
                   >
                     Jelajahi
                   </button>
