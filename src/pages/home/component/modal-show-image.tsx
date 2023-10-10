@@ -3,12 +3,16 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { type Image } from "@/types/image";
 import { AiOutlineClose } from 'react-icons/ai'
+import { BsTrash } from 'react-icons/bs'
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import { formatBytes } from '@/utils/formatBytes';
 import { useCreateTour } from '@/api/services/tour';
 import { useCreateRoom } from '@/api/services/room';
+import { useDeleteImage } from "@/api/services/image";
 import { errorToaster } from '@/components/toaster/error-toaster';
+import { successToaster } from "@/components/toaster/success-toaster";
+import PulseLoader from "react-spinners/PulseLoader";
 
 type Props = {
   isShow: boolean;
@@ -24,10 +28,11 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
 
   const { mutate: createRoom, status: statusCreateRoom } = useCreateRoom()
 
+  const { mutate: deleteImage, status: statusDeleteImage } = useDeleteImage()
+
   const navigate = useNavigate()
 
   const createRoomAction = ({ tour_id }: { tour_id: number }) => {
-    
     createRoom({
       name: 'Ruangan',
       image_url: image?.file_path as string,
@@ -56,6 +61,28 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
     )
   }
 
+  const handleDeleteImage = () => {
+    const ask = confirm('Yakin ingin menghapus gambar ?')
+
+    if (ask) {
+      deleteImage(
+        {
+          image_id: image?.id as number
+        },
+        {
+          onSuccess: () => {
+            successToaster({ message: 'Berhasil menghapus gambar' })
+            onClose()
+          },
+          onError: () => {
+            errorToaster({ message: 'Gagal mengapus gambar' })
+          }
+        }
+      )
+    }
+
+  }
+
   return (
     <Modal show={isShow}>
       <div className="w-7/12 bg-white rounded-md p-1">
@@ -64,10 +91,11 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
             <AiOutlineClose className="text-2xl" />
           </button>
         </header>
-        <div className="flex gap-3 px-5 pt-5 pb-9" aria-label="modal-body">
+        <div className="flex gap-5 px-5 pt-5 pb-9" aria-label="modal-body">
           <div className="w-8/12" aria-label="image-wrapper">
             <LazyLoadImage
               src={ORIGIN + image?.file_path}
+              className="rounded-md"
               effect="blur"
               alt="360-image-preview"
             />
@@ -82,14 +110,30 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
               <p className="text-gray-500">size</p>
               <p className="font-medium">{formatBytes(image?.file_size as number)}</p>
             </div>
-            <div className="flex justify-end mt-auto mb-0">
+            <div className="flex justify-between mt-5 mb-0">
               <button
+                onClick={handleDeleteImage}
+                disabled={statusDeleteImage === 'loading'}
+              >
+                {
+                  statusDeleteImage === 'loading'
+                    ? <PulseLoader color='red' size={10} />
+                    : <BsTrash className="text-2xl text-red-600" />
+                }
+              </button>
+              <button
+                disabled={
+                  statusCreateTour === 'loading' ||
+                  statusCreateRoom === 'loading'
+                }
                 className="bg-blue-500 relative text-white w-max px-3 py-2 rounded-md font-medium text-[.8rem] tracking-wide"
                 onClick={addNewScene}
               >
                 {
                   statusCreateTour === 'loading' ||
-                    statusCreateRoom === 'loading' ? 'Loading..' : 'CREATE TOUR'
+                    statusCreateRoom === 'loading' ?
+                    <PulseLoader color='white' size={10} />
+                    : 'CREATE TOUR'
                 }
               </button>
             </div>

@@ -91,26 +91,35 @@ export default function Tours() {
           )
           : null}
 
-        {toursStatus === 'success' ? ( // => when success
-          <>
-            <Filtering
-              row={row}
-              onChangeRow={handleChangeRow}
-              onChangeSearch={handleChangeSearch}
-            />
-            <TableData
-              data={toursMemoize ?? []}
-            />
-            <Pagination
-              page={page}
-              row={row}
-              rowInfo={rowInfo}
-              onSetPage={setPage}
-              data={searchDebounce ? toursFiltered : tours?.data}
-            />
+        {toursStatus === 'success' ?
+          toursMemoize?.length === 0 ?
+            (
+              <div className='py-10'>
+                <p className='text-center text-lg font-light'>Tidak ada data</p>
+              </div>
+            )
+            :
+            (
+              // => when success
+              <>
+                <Filtering
+                  row={row}
+                  onChangeRow={handleChangeRow}
+                  onChangeSearch={handleChangeSearch}
+                />
+                <TableData
+                  data={toursMemoize ?? []}
+                />
+                <Pagination
+                  page={page}
+                  row={row}
+                  rowInfo={rowInfo}
+                  onSetPage={setPage}
+                  data={searchDebounce ? toursFiltered : tours?.data}
+                />
 
-          </>
-        ) : null}
+              </>
+            ) : null}
 
         {
           toursStatus === 'error' // => when error

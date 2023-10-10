@@ -72,19 +72,38 @@ export const useUpdateTour = () => {
 
   const queryClient = useQueryClient()
 
-  const PATCH = async (payload: Payload) => {
+  const PUT = async (payload: Payload) => {
 
-    const formData = new FormData()
-    formData.append('name', payload.name)
-
-    const req = await Axios.patch(`/api/tour/${payload.tour_id}`, formData)
+    const req = await Axios.put(`/api/tour/${payload.tour_id}`, { name: payload.name })
     return req.data
   }
 
   return useMutation<SuccessResponse<unknown>, AxiosError, Payload>({
-    mutationFn: PATCH,
+    mutationFn: PUT,
     onSuccess: () => queryClient.invalidateQueries(['TOUR'])
   })
 }
+
+
+export const useDeleteTour = () => {
+  type Params = {
+    tour_id: number;
+  }
+
+  const queryClient = useQueryClient()
+
+  const DELETE = async ({ tour_id }: Params) => {
+
+    const req = await Axios.delete(`/api/tour/${tour_id}`)
+
+    return req.data
+  }
+
+  return useMutation<SuccessResponse<unknown>, AxiosError<ErrorResponse>, Params>({
+    mutationFn: DELETE,
+    onSuccess: () => queryClient.invalidateQueries(['TOURS'])
+  })
+}
+
 
 

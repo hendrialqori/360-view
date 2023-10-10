@@ -5,6 +5,10 @@ import { MdOutlineArrowDropUp, MdOutlineArrowDropDown } from 'react-icons/md'
 import dayjs from 'dayjs'
 import 'dayjs/locale/id'
 import { useNavigate } from 'react-router-dom'
+import { useDeleteTour } from '@/api/services/tour'
+import { successToaster } from '@/components/toaster/success-toaster'
+import { errorToaster } from '@/components/toaster/error-toaster'
+import PulseLoader from 'react-spinners/PulseLoader'
 
 type Props = {
   data: Tour[];
@@ -22,6 +26,8 @@ const sortMapping = {
 } as const
 
 export const TableData: React.FC<Props> = ({ data }) => {
+
+  const { mutate: deleteTour, status: statusDeleteTour } = useDeleteTour()
 
   const navigate = useNavigate()
 
@@ -59,6 +65,28 @@ export const TableData: React.FC<Props> = ({ data }) => {
 
   const navigateToEditor = (id: number) =>
     () => navigate(`/editor/${id}`)
+
+  const handleDeleteTour = (id: number) =>
+    () => {
+      const ask = confirm('Yakin ingin menghapus tour ?')
+
+      if (ask) {
+        deleteTour(
+          {
+            tour_id: id
+          },
+          {
+            onSuccess: () => {
+              successToaster({ message: 'Berhasil menghapus tour' })
+            },
+            onError: () => {
+              errorToaster({ message: 'Gagal mengapus tour' })
+            }
+          }
+        )
+      }
+
+    }
 
   return (
     <div className='overflow-x-auto' aria-label='table-container'>
@@ -120,6 +148,24 @@ export const TableData: React.FC<Props> = ({ data }) => {
                     onClick={navigateToEditor(item.id)}
                   >
                     Edit
+                  </button>
+                  <button
+                    disabled={statusDeleteTour === 'loading'}
+                    className={cn(
+                      "transition px-5 md:px-7 py-[.30rem] md:py-[.35rem] rounded-md",
+                      'text-base bg-white text-blue-600',
+                      'border md:border-2 border-blue-600',
+                      'text-sm md:text-base',
+                      'hover:bg-blue-600 hover:text-white'
+                    )}
+                    type="button"
+                    onClick={handleDeleteTour(item.id)}
+                  >
+                    {
+                      statusDeleteTour === 'loading'
+                        ? <PulseLoader color='skyblue' size={10} />
+                        : 'Hapus'
+                    }
                   </button>
                 </div>
               </td>
