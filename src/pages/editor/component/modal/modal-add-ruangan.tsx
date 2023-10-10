@@ -90,7 +90,7 @@ export const ModalAddRuangan = ({ isShow, onClose }: Props) => {
                     onClick={pickImageUrl(image.file_path as string)}
                   >
                     <img
-                      src={ORIGIN + image?.file_path}
+                      src={ORIGIN + image?.thumbnail_path}
                       alt='avatar'
                       loading='lazy'
                     />

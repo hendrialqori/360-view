@@ -94,7 +94,7 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
         <div className="flex gap-5 px-5 pt-5 pb-9" aria-label="modal-body">
           <div className="w-8/12" aria-label="image-wrapper">
             <LazyLoadImage
-              src={ORIGIN + image?.file_path}
+              src={ORIGIN + image?.thumbnail_path}
               className="rounded-md"
               effect="blur"
               alt="360-image-preview"

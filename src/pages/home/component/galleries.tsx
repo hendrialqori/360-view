@@ -30,7 +30,7 @@ export const Galleries = React.memo(({ onClickImage }: Props) => {
           onClick={() => onClickImage(image)}
         >
           <LazyLoadImage
-            src={ORIGIN + image?.file_path}
+            src={ORIGIN + image?.thumbnail_path}
             // src='/images/5.jpeg'
             alt='image-view'
             className='object-fill h-[390px] aspect-square'
