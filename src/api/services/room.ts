@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { type Room } from '@/types/room';
 import { type Hotspot } from '@/types/hotspot';
 
-export const useGetRoom = ({ id }: { id: string  }) => {
+export const useGetRoom = ({ id }: { id: string }) => {
   const GET = async (): Promise<SuccessResponse<Room> | undefined> => {
     const req = await Axios.get(`/api/room/${id}`)
     return req.data
@@ -62,22 +62,40 @@ export const useCreateRoom = () => {
 export const useUpdateRoom = () => {
   type Params = {
     room_id: number;
-    name: string;
+    payload: FormData
   }
 
   const queryClient = useQueryClient()
 
-  const PATCH = async ({ room_id, name }: Params) => {
-    const req = await Axios.patch(`/api/room/${room_id}`, { name })
+  const PUT = async ({ room_id, payload }: Params) => {
+   
+    const req = await Axios.post(`/api/room/${room_id}`, payload)
     return req.data
   }
 
   return useMutation<SuccessResponse<unknown>, AxiosError<ErrorResponse>, Params>({
-    mutationFn: PATCH,
-    onSuccess: () => queryClient.invalidateQueries(['ROOM'])
+    mutationFn: PUT,
+    onSuccess: () => queryClient.invalidateQueries(['ROOMS'])
   })
 }
 
+export const useDeleteRoom = () => {
+  type Params = {
+    room_id: number;
+  }
+
+  const queryClient = useQueryClient()
+
+  const DELETE = async ({ room_id }: Params) => {
+    const req = await Axios.delete(`/api/room/${room_id}`)
+    return req.data
+  }
+
+  return useMutation<SuccessResponse<unknown>, AxiosError<ErrorResponse>, Params>({
+    mutationFn: DELETE,
+    onSuccess: () => queryClient.invalidateQueries(['ROOMS'])
+  })
+}
 
 
 

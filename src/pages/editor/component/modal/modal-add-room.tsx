@@ -17,7 +17,7 @@ type Props = {
 
 const ORIGIN = import.meta.env.VITE_ORIGIN;
 
-export const ModalAddRuangan = ({ isShow, onClose }: Props) => {
+export const ModalAddRoom = ({ isShow, onClose }: Props) => {
 
   const { idTour } = useParams()
 

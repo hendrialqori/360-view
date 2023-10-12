@@ -51,8 +51,8 @@ export default function Tour() {
         hfov={100}
         haov={360}
         vaov={180}
-        pitch={0}
-        yaw={0}
+        pitch={currentRoom?.pitch ?? 0}
+        yaw={currentRoom?.yaw ?? 0}
       >
         {hostspots?.data?.map((hotspot, i) => (
           hotspot.type === 'info' ? (

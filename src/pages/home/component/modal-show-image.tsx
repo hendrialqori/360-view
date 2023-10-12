@@ -85,7 +85,7 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
 
   return (
     <Modal show={isShow}>
-      <div className="w-7/12 bg-white rounded-md p-1">
+      <div className="w-[850px] bg-white rounded-md p-1">
         <header className="flex justify-end p-2" aria-label="modal-head">
           <button type="button" onClick={onClose}>
             <AiOutlineClose className="text-2xl" />

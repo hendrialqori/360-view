@@ -1,9 +1,7 @@
 import React from 'react'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
-
 import { useGetImages } from '@/api/services/image';
-
 import { type Image } from '@/types/image';
 import { cn } from '@/utils/clsx';
 
@@ -26,14 +24,17 @@ export const Galleries = React.memo(({ onClickImage }: Props) => {
       {images?.data.map((image, i) => (
         <div
           key={i}
-          className='overflow-hidden cursor-pointer border rounded-md'
+          className={cn(
+            'overflow-hidden cursor-pointer border',
+            'w-max md:w-full h-max flex justify-center items-center',
+            'rounded-md'
+          )}
           onClick={() => onClickImage(image)}
         >
           <LazyLoadImage
             src={ORIGIN + image?.thumbnail_path}
-            // src='/images/5.jpeg'
             alt='image-view'
-            className='object-fill h-[390px] aspect-square'
+            className='object-fill aspect-video md:aspect-square w-full rounded-md'
             effect='blur'
           />
         </div>
