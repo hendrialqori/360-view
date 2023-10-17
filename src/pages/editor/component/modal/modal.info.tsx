@@ -27,8 +27,8 @@ export const ModalInfo = ({ hotspot, coordinateX, coordinateY, forceRenderPanora
   const [information, setInformation] = React.useState(hotspot?.text ?? '')
 
   React.useEffect(() => {
-    setInformation(hotspot.text as string)
-  }, [hotspot.text])
+    setInformation(hotspot?.text as string ?? '')
+  }, [hotspot?.text])
 
 
   const handleUpdateHotspot = () => {

@@ -9,6 +9,7 @@ import { useDeleteTour } from '@/api/services/tour'
 import { successToaster } from '@/components/toaster/success-toaster'
 import { errorToaster } from '@/components/toaster/error-toaster'
 import PulseLoader from 'react-spinners/PulseLoader'
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 
 type Props = {
   data: Tour[];
@@ -34,6 +35,8 @@ export const TableData: React.FC<Props> = ({ data }) => {
   const [sortBy, setSortBy] = React.useState<keyof typeof sortMapping>('Nama Tour')
 
   const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('asc')
+
+  const [copyFn] = useCopyToClipboard()
 
   const dataMemoize = React.useMemo(() => {
 
@@ -65,6 +68,19 @@ export const TableData: React.FC<Props> = ({ data }) => {
 
   const navigateToEditor = (id: number) =>
     () => navigate(`/editor/${id}`)
+
+  const handleCopyToClipBoard = (id: number) =>
+    () => {
+      const host = window.location.host;
+
+      copyFn(`${host}/tour/${id}`, (status) => {
+        if (status === 'success') {
+          successToaster({ message: 'Behasil copy to clipboard' })
+          return;
+        }
+        errorToaster({ message: 'Gagal copy to clipboard' })
+      })
+    }
 
   const handleDeleteTour = (id: number) =>
     () => {
@@ -123,42 +139,23 @@ export const TableData: React.FC<Props> = ({ data }) => {
               <td className="w-1/6 py-[.3rem] md:py-[.5rem] lg:py-2 text-center text-sm md:text-base">{item.name}</td>
               <td className="w-1/6 py-[.3rem] md:py-[.5rem] lg:py-2 text-center text-sm md:text-base">
                 <div className='flex items-center justify-center gap-3'>
-                  <button
-                    className={cn(
-                      "transition px-5 md:px-7 py-[.30rem] md:py-[.35rem] rounded-md",
-                      'text-base bg-white text-blue-600',
-                      'border md:border-2 border-blue-600',
-                      'text-sm md:text-base',
-                      'hover:bg-blue-600 hover:text-white'
-                    )}
-                    type="button"
+                  <TableButton
                     onClick={navigateToTour(item.id)}
                   >
                     Jelajahi
-                  </button>
-                  <button
-                    className={cn(
-                      "transition px-5 md:px-7 py-[.30rem] md:py-[.35rem] rounded-md",
-                      'text-base bg-white text-blue-600',
-                      'border md:border-2 border-blue-600',
-                      'text-sm md:text-base',
-                      'hover:bg-blue-600 hover:text-white'
-                    )}
-                    type="button"
+                  </TableButton>
+                  <TableButton
                     onClick={navigateToEditor(item.id)}
                   >
                     Edit
-                  </button>
-                  <button
+                  </TableButton>
+                  <TableButton
+                    onClick={handleCopyToClipBoard(item.id)}
+                  >
+                    Share
+                  </TableButton>
+                  <TableButton
                     disabled={statusDeleteTour === 'loading'}
-                    className={cn(
-                      "transition px-5 md:px-7 py-[.30rem] md:py-[.35rem] rounded-md",
-                      'text-base bg-white text-blue-600',
-                      'border md:border-2 border-blue-600',
-                      'text-sm md:text-base',
-                      'hover:bg-blue-600 hover:text-white'
-                    )}
-                    type="button"
                     onClick={handleDeleteTour(item.id)}
                   >
                     {
@@ -166,7 +163,7 @@ export const TableData: React.FC<Props> = ({ data }) => {
                         ? <PulseLoader color='skyblue' size={10} />
                         : 'Hapus'
                     }
-                  </button>
+                  </TableButton>
                 </div>
               </td>
             </tr>
@@ -176,5 +173,26 @@ export const TableData: React.FC<Props> = ({ data }) => {
       </table>
     </div>
 
+  )
+}
+
+type TableButtonProps = React.ComponentProps<'button'>
+
+const TableButton = ({ children, ...rest }: TableButtonProps) => {
+
+  return (
+    <button
+      {...rest}
+      className={cn(
+        "transition px-5 md:px-7 py-[.30rem] md:py-[.35rem] rounded-md",
+        'text-base bg-white text-blue-600',
+        'border md:border-2 border-blue-600',
+        'text-sm md:text-base',
+        'hover:bg-blue-600 hover:text-white'
+      )}
+      type="button"
+    >
+      {children}
+    </button>
   )
 }

@@ -26,7 +26,7 @@ export default function Home() {
         <Galleries onClickImage={showModalImage} />
       </Layout>
 
-      <ModalShowImage 
+      <ModalShowImage
         isShow={modalImage}
         image={image as Image}
         onClose={onClose}

@@ -3,14 +3,16 @@ import React from 'react'
 import * as Recoil from 'recoil'
 import { viewerCoordinate, initialViewerCoordinate } from '@/store/scene';
 import { useSearchParams } from 'react-router-dom';
-import { ModalInfo } from '../modal/modal.info';
+
 
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 //@ts-ignore
 import { Pannellum } from "pannellum-react";
-import { ModalCustom } from '../modal/modal-custom';
 import { useGetRoom, useGetRoomHotspots } from '@/api/services/room';
 import { Hotspot } from '@/types/hotspot';
+import { ModalCustom } from '../modal/modal-custom';
+import { ModalInfo } from '../modal/modal.info';
+import { ModalLabel } from '../modal/modal-label';
 
 const ORIGIN = import.meta.env.VITE_ORIGIN;
 
@@ -20,7 +22,7 @@ export const RoomEditor = () => {
 
   const { data: room, status: statusRoom } = useGetRoom({ id: String(query.get('roomId')) })
 
-  const { data: hostspots } = useGetRoomHotspots({ id: String(query.get('roomId')) })
+  const { data: hotspots } = useGetRoomHotspots({ id: String(query.get('roomId')) })
 
   const panoramaRef = React.useRef<any | null>(null);
 
@@ -28,7 +30,7 @@ export const RoomEditor = () => {
 
   const setViewerCoordinatAtom = Recoil.useSetRecoilState(viewerCoordinate)
 
-  const [modal, setModal] = React.useState<'custom' | 'info' | null>(null)
+  const [modal, setModal] = React.useState<'custom' | 'info' | 'label' | null>(null)
 
   const [hotspotId, setHotspotId] = React.useState<string | null>(null)
 
@@ -45,12 +47,12 @@ export const RoomEditor = () => {
   }, [room?.data, query.get('roomId')])
 
   const currentHotspot = React.useMemo(() => {
-    const temp = hostspots?.data.find((hotspot) =>
+    const temp = hotspots?.data.find((hotspot) =>
       hotspot.id === Number(hotspotId)
     )
 
     return temp
-  }, [hostspots?.data, hotspotId])
+  }, [hotspots, hotspotId])
 
   const handleShowModal = ({ type, id }:
     { type: typeof modal; id: string }) =>
@@ -63,14 +65,10 @@ export const RoomEditor = () => {
   const handleCloseModal = React.useCallback(() => {
     setModal(null)
     setHotspotId(null)
-    
-
   }, [])
-
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault()
-
     setPointer({
       x: e.clientX,
       y: e.clientY,
@@ -83,6 +81,24 @@ export const RoomEditor = () => {
     setViewerCoordinatAtom({ pitch, yaw })
   }
 
+  const handleCustoHotspot = React.useCallback((hotSpotDiv: HTMLDivElement, args: any) => {
+    hotSpotDiv.classList.add('custom-tooltip');
+    const span = document.createElement('span');
+    span.innerHTML = args.label;
+    hotSpotDiv.appendChild(span);
+    span.style.width = span.scrollWidth - 20 + 'px';
+    span.style.marginLeft = -(span.scrollWidth - hotSpotDiv.offsetWidth) / 2 + 'px';
+    span.style.marginTop = -span.scrollHeight - 12 + 'px';
+
+    // span.addEventListener('click', () => { alert(args.label) })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hotspots, modal, hotspotId])
+
+  const handleCssCustomClass = (type: typeof modal) => {
+
+    if (type === 'info') return 'info-custom-style'
+    if (type === 'label') return 'label-custom-style'
+  }
 
   return (
     <div
@@ -107,14 +123,16 @@ export const RoomEditor = () => {
         // onMousedown={handleMouseDown}
         onRender={handleSubscribe}
       >
-        {hostspots?.data.map((hotspot, i) => (
+        {hotspots?.data.map((hotspot, i) => (
           <Pannellum.Hotspot
             key={i}
             type={'custom'}
             pitch={hotspot?.pitch}
             yaw={hotspot?.yaw}
             autoRotate={0}
-            cssClass={hotspot.type == 'info' ? 'info-custom-style' : ''}
+            tooltip={hotspot.type === 'label' && handleCustoHotspot}
+            tooltipArg={{ label: hotspot.text }}
+            cssClass={handleCssCustomClass(hotspot.type)}
             handleClick={handleShowModal({
               id: String(hotspot?.id),
               type: hotspot?.type
@@ -125,6 +143,16 @@ export const RoomEditor = () => {
 
       {modal === 'info' && hotspotId && (
         <ModalInfo
+          hotspot={currentHotspot as Hotspot}
+          coordinateX={pointer.x}
+          coordinateY={pointer.y}
+          forceRenderPanorana={() => panoramaRef.current.forceRender()}
+          onClose={handleCloseModal}
+        />
+      )}
+
+      {modal === 'label' && hotspotId && (
+        <ModalLabel
           hotspot={currentHotspot as Hotspot}
           coordinateX={pointer.x}
           coordinateY={pointer.y}
@@ -146,7 +174,14 @@ export const RoomEditor = () => {
   )
 }
 
-
+{/* <Pannellum.Hotspot
+          type='custom'
+          pitch="13.20"
+          yaw="59.23"
+          tooltip={handleCustoHotspot}
+          tooltipArg={{ label: 'Hendri Alqori from west borneo, Indonesia' }}
+          cssClass="label-custom-style"
+        /> */}
 
 {/* {currentScene?.image && (
         <div

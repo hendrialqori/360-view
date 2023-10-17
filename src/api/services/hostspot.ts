@@ -9,7 +9,7 @@ export const useCreateHostpot = () => {
     room_id: number;
     pitch: number;
     yaw: number;
-    type: 'custom' | 'info'
+    type: 'custom' | 'info' | 'label'
     text?: string
   }
 

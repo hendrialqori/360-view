@@ -37,7 +37,28 @@ export default function Tour() {
   const { data: hostspots } = useGetRoomHotspots({ id: String(roomId) })
 
   const moveRoom = ({ room_id }: { room_id: number }) =>
-    () => setRoomId(room_id)
+    () => {
+      if (!room_id) return;
+
+      setRoomId(room_id)
+    }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleCustoHotspot = (hotSpotDiv: HTMLDivElement, args: any) => {
+
+    console.log('this func re-render!', args)
+
+    hotSpotDiv.classList.add('custom-tooltip');
+    const span = document.createElement('span');
+    span.innerHTML = args.label;
+    hotSpotDiv.appendChild(span);
+    span.style.width = span.scrollWidth - 20 + 'px';
+    span.style.marginLeft = -(span.scrollWidth - hotSpotDiv.offsetWidth) / 2 + 'px';
+    span.style.marginTop = -span.scrollHeight - 12 + 'px';
+
+    // span.addEventListener('click', () => { alert(args.label) })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }
 
   return (
     <Layout>
@@ -64,16 +85,18 @@ export default function Tour() {
               text={hotspot.text}
             />
           ) :
-            hotspot.type === 'custom' ? (
+            (
               <Pannellum.Hotspot
                 key={i}
                 type={'custom'}
                 pitch={hotspot?.pitch}
                 yaw={hotspot?.yaw}
+                tooltip={hotspot?.type === 'label' && handleCustoHotspot}
+                tooltipArg={{ label: hotspot?.text }}
+                cssClass={hotspot?.type === 'label' && 'label-custom-style'}
                 handleClick={moveRoom({ room_id: Number(hotspot.room_link_id) })}
               />
             )
-              : null
         ))}
       </Pannellum>
     </Layout>
