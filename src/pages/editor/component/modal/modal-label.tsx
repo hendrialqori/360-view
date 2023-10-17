@@ -52,11 +52,11 @@ export const ModalLabel =
             //   )
             // })
 
-            // forceRenderPanorana()
+            forceRenderPanorana()
 
             onClose()
             successToaster({ message: 'Berhasil update label' })
-            window.location.reload()
+            // window.location.reload()
           },
           onError: () => {
             errorToaster({ message: 'Gagal update label' })
