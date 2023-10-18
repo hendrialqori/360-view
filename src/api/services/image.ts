@@ -21,7 +21,7 @@ export const useGetImages = () => {
 
 export const useDeleteImage = () => {
   type Params = {
-    image_id: number;
+    image_id: string;
   }
 
   const queryClient = useQueryClient()

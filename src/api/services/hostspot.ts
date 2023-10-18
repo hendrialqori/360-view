@@ -5,8 +5,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const useCreateHostpot = () => {
   type Payload = {
-    tour_id: number;
-    room_id: number;
+    tour_id: string;
+    room_id: string;
     pitch: number;
     yaw: number;
     type: 'custom' | 'info' | 'label'
@@ -38,7 +38,7 @@ export const useCreateHostpot = () => {
 
 export const useUpdateHotspot = () => {
   type Params = {
-    hostpot_id: number;
+    hostpot_id: string;
     payload: FormData
   }
 
@@ -64,7 +64,7 @@ export const useUpdateHotspot = () => {
 
 export const useDeleteHotspot = () => {
   type Params = {
-    hostpot_id: number;
+    hostpot_id: string;
   }
 
   const queryClient = useQueryClient()

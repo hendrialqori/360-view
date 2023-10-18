@@ -22,13 +22,13 @@ export const ModalCustom = ({ hotspot, coordinateX, coordinateY, forceRenderPano
 
   const { idTour } = useParams()
 
-  const { data: rooms } = useGetTourRooms({ id: Number(idTour) })
+  const { data: rooms } = useGetTourRooms({ id: String(idTour) })
 
   const { mutate: updateHostpot, status: updateStatus } = useUpdateHotspot()
 
   const { mutate: deleteHotspot, status: deleteStatus } = useDeleteHotspot()
 
-  const [isSelectRoomId, setIsSelectRoomId] = React.useState<number | null>(hotspot?.room_link_id as number ?? null)
+  const [isSelectRoomId, setIsSelectRoomId] = React.useState<string | null>(hotspot?.room_link_id as string ?? null)
 
   const handleUpdateHotspot = () => {
 
@@ -37,7 +37,7 @@ export const ModalCustom = ({ hotspot, coordinateX, coordinateY, forceRenderPano
     formData.append('_method', 'PUT')
 
     updateHostpot({
-      hostpot_id: Number(hotspot.id),
+      hostpot_id: String(hotspot.id),
       payload: formData
     },
       {

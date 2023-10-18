@@ -32,7 +32,7 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
 
   const navigate = useNavigate()
 
-  const createRoomAction = ({ tour_id }: { tour_id: number }) => {
+  const createRoomAction = ({ tour_id }: { tour_id: string }) => {
     createRoom({
       name: 'Ruangan',
       image_url: image?.file_path as string,
@@ -67,7 +67,7 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
     if (ask) {
       deleteImage(
         {
-          image_id: image?.id as number
+          image_id: image?.id as string
         },
         {
           onSuccess: () => {

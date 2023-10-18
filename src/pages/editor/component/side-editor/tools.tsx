@@ -49,7 +49,7 @@ export const Tools = React.memo(() => {
 
     updateRoom(
       {
-        room_id: Number(idRoom),
+        room_id: String(idRoom),
         payload: formData
       },
       {
@@ -72,8 +72,8 @@ export const Tools = React.memo(() => {
           pitch: viewerCoordinateAtom.pitch,
           yaw: viewerCoordinateAtom.yaw,
           type: type,
-          tour_id: Number(idTour),
-          room_id: Number(idRoom)
+          tour_id: String(idTour),
+          room_id: String(idRoom)
         },
         {
           onSuccess: () => {

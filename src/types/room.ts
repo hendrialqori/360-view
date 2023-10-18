@@ -1,6 +1,6 @@
 export type Room = {
-    id: number,
-    tour_id: number,
+    id: string,
+    tour_id: string,
     name: string,
     image_url: string,
     pitch: number,

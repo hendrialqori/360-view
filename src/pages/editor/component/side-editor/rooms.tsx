@@ -7,7 +7,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { cn } from "@/utils/clsx"
 
 type Panel = {
-  room_id: number;
+  room_id: string;
   room_name: string;
 }
 
@@ -28,7 +28,7 @@ export const Rooms =
 
     const idRoom = query.get('roomId')
 
-    const { data: rooms } = useGetTourRooms({ id: Number(idTour) })
+    const { data: rooms } = useGetTourRooms({ id: String(idTour) })
 
     const roomsMemoize = React.useMemo(() => {
       return rooms?.data
@@ -57,7 +57,7 @@ export const Rooms =
                 key={i}
                 className={cn(
                   'flex items-center justify-between px-5 w-full py-3 relative',
-                  Number(idRoom) === room.id ? 'bg-gray-600' : 'bg-gray-700'
+                  String(idRoom) === room.id ? 'bg-gray-600' : 'bg-gray-700'
                 )}
                 type="button"
                 onClick={moveToTargetScene(room.id as unknown as string)}
