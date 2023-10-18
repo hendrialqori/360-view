@@ -67,6 +67,8 @@ export const RoomEditor = () => {
     setHotspotId(null)
   }, [])
 
+  const [pannellumKey, setPannelumKey] = React.useState(Math.random())
+
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault()
     setPointer({
@@ -100,12 +102,15 @@ export const RoomEditor = () => {
     if (type === 'label') return 'label-custom-style'
   }
 
+ 
+
   return (
     <div
       className="col-span-10 h-[calc(100vh_-_60px)] overflow-scroll relative"
       onClick={handleMouseDown}
     >
       <Pannellum
+        key={pannellumKey}
         ref={panoramaRef}
         title={currentScene?.name}
         width="100%"
@@ -156,7 +161,7 @@ export const RoomEditor = () => {
           hotspot={currentHotspot as Hotspot}
           coordinateX={pointer.x}
           coordinateY={pointer.y}
-          forceRenderPanorana={() => panoramaRef.current.forceRender()}
+          forceRenderPanorana={() => setPannelumKey(Math.random())}
           onClose={handleCloseModal}
         />
       )}
