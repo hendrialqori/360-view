@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React from 'react'
 import { cn } from "@/utils/clsx";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
@@ -71,12 +70,5 @@ export default function Login() {
         <p className="text-gray-100">Powered by shinta VR</p>
       </footer>
     </main>
-=======
-export default function Login() {
-  return (
-    <div>
-      
-    </div>
->>>>>>> main
   )
 }
