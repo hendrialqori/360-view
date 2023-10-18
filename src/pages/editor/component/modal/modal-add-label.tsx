@@ -48,8 +48,8 @@ export const ModalAddLabel = ({ isShow, onClose }: Props) => {
         pitch: viewerCoordinateAtom.pitch,
         yaw: viewerCoordinateAtom.yaw,
         type: 'label',
-        tour_id: Number(idTour),
-        room_id: Number(idRoom),
+        tour_id: String(idTour),
+        room_id: String(idRoom),
         text: labelName
       },
       {

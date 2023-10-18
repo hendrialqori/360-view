@@ -34,7 +34,7 @@ export const useGetRoomHotspots = ({ id }: { id: string }) => {
 
 export const useCreateRoom = () => {
   type Payload = {
-    tour_id: number;
+    tour_id: string;
     name: string;
     image_url: string
   }
@@ -61,7 +61,7 @@ export const useCreateRoom = () => {
 
 export const useUpdateRoom = () => {
   type Params = {
-    room_id: number;
+    room_id: string;
     payload: FormData
   }
 
@@ -81,7 +81,7 @@ export const useUpdateRoom = () => {
 
 export const useDeleteRoom = () => {
   type Params = {
-    room_id: number;
+    room_id: string;
   }
 
   const queryClient = useQueryClient()

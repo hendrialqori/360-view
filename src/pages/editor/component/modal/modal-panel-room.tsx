@@ -11,8 +11,8 @@ import PulseLoader from "react-spinners/PulseLoader";
 import { ModalChangeNameRoom } from "./modal-change-name-room";
 
 type Props = {
-  tourId: number;
-  roomId: number
+  tourId: string;
+  roomId: string
   roomName: string;
   coordinateX: number;
   coordinateY: number;

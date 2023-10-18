@@ -63,13 +63,13 @@ export const TableData: React.FC<Props> = ({ data }) => {
       setSortBy(baseOn)
     }
 
-  const navigateToTour = (id: number) =>
+  const navigateToTour = (id: string) =>
     () => navigate(`/tour/${id}`)
 
-  const navigateToEditor = (id: number) =>
+  const navigateToEditor = (id: string) =>
     () => navigate(`/editor/${id}`)
 
-  const handleCopyToClipBoard = (id: number) =>
+  const handleCopyToClipBoard = (id: string) =>
     () => {
       const host = window.location.host;
 
@@ -82,7 +82,7 @@ export const TableData: React.FC<Props> = ({ data }) => {
       })
     }
 
-  const handleDeleteTour = (id: number) =>
+  const handleDeleteTour = (id: string) =>
     () => {
       const ask = confirm('Yakin ingin menghapus tour ?')
 

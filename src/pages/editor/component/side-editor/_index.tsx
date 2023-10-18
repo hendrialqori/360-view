@@ -18,7 +18,7 @@ export const SideEditor = () => {
   const [modal, setModal] = React.useState<typeof modalState>(modalState)
 
   const [room, setRoom] = React.useState({
-    id: null as number | null,
+    id: null as string | null,
     name: ''
   })
 
@@ -36,7 +36,7 @@ export const SideEditor = () => {
 
   const handleRoomPannel = React.useCallback((
     { room_id, room_name }:
-      { room_id: number; room_name: string }
+      { room_id: string; room_name: string }
   ) =>
 
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -74,7 +74,7 @@ export const SideEditor = () => {
 
       {room.id && (
         <ModalPanelRoom
-          tourId={Number(idTour)}
+          tourId={String(idTour)}
           roomId={room.id}
           roomName={room.name}
           coordinateX={panelCoordinate.x}

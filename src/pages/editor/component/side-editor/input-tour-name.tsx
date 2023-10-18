@@ -10,7 +10,7 @@ export const InputTourName = React.memo(() => {
 
   const { idTour } = useParams()
 
-  const { data: tour } = useGetTour({ tour_id: Number(idTour) })
+  const { data: tour } = useGetTour({ tour_id: String(idTour) })
 
   const [tourName, setTourName] = React.useState('')
 
@@ -23,7 +23,7 @@ export const InputTourName = React.memo(() => {
   const handleUpdateTourName = () => {
     updateTour(
       {
-        tour_id: Number(idTour),
+        tour_id: String(idTour),
         name: tourName
       },
       {

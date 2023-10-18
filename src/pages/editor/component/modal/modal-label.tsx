@@ -39,7 +39,7 @@ export const ModalLabel =
       formData.append('_method', 'PUT')
 
       updateHostpot({
-        hostpot_id: Number(hotspot.id),
+        hostpot_id: hotspot.id,
         payload: formData
       },
         {

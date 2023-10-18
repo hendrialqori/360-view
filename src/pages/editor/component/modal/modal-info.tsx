@@ -18,6 +18,7 @@ type Props = {
 
 export const ModalInfo = ({ hotspot, coordinateX, coordinateY, forceRenderPanorana, onClose }: Props) => {
 
+
   const containerRef = React.useRef<HTMLDivElement | null>(null)
 
   const { mutate: updateHostpot, status: updateStatus } = useUpdateHotspot()
@@ -38,7 +39,7 @@ export const ModalInfo = ({ hotspot, coordinateX, coordinateY, forceRenderPanora
     formData.append('_method', 'PUT')
 
     updateHostpot({
-      hostpot_id: Number(hotspot.id),
+      hostpot_id: String(hotspot.id),
       payload: formData
     },
       {
@@ -61,7 +62,7 @@ export const ModalInfo = ({ hotspot, coordinateX, coordinateY, forceRenderPanora
     if (ask) {
       deleteHotspot(
         {
-          hostpot_id: hotspot.id
+          hostpot_id: String(hotspot.id)
         },
         {
           onSuccess: () => {
