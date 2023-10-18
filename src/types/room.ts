@@ -1,5 +1,5 @@
 export type Room = {
-    id: number,
+    id: string,
     tour_id: number,
     name: string,
     image_url: string,

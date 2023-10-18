@@ -11,7 +11,7 @@ import { Pannellum } from "pannellum-react";
 import { useGetRoom, useGetRoomHotspots } from '@/api/services/room';
 import { Hotspot } from '@/types/hotspot';
 import { ModalCustom } from '../modal/modal-custom';
-import { ModalInfo } from '../modal/modal.info';
+import { ModalInfo } from '../modal/modal-info';
 import { ModalLabel } from '../modal/modal-label';
 
 const ORIGIN = import.meta.env.VITE_ORIGIN;
@@ -48,7 +48,7 @@ export const RoomEditor = () => {
 
   const currentHotspot = React.useMemo(() => {
     const temp = hotspots?.data.find((hotspot) =>
-      hotspot.id === Number(hotspotId)
+      hotspot.id === hotspotId
     )
 
     return temp

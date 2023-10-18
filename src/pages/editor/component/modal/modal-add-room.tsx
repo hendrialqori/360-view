@@ -46,7 +46,7 @@ export const ModalAddRoom = ({ isShow, onClose }: Props) => {
       {
         image_url: imageUrl as string,
         name: roomName,
-        tour_id: Number(idTour)
+        tour_id: String(idTour)
       },
       {
         onSuccess: () => {

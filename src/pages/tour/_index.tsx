@@ -13,11 +13,11 @@ const ORIGIN = import.meta.env.VITE_ORIGIN;
 
 export default function Tour() {
 
-  const [roomId, setRoomId] = React.useState<number | null>(null)
+  const [roomId, setRoomId] = React.useState<string | null>(null)
 
   const { idTour } = useParams()
 
-  const { data: rooms, status: statusRoom } = useGetTourRooms({ id: Number(idTour) })
+  const { data: rooms, status: statusRoom } = useGetTourRooms({ id: String(idTour) })
 
   React.useEffect(() => {
     if (rooms?.data.length) {
@@ -36,7 +36,7 @@ export default function Tour() {
 
   const { data: hostspots } = useGetRoomHotspots({ id: String(roomId) })
 
-  const moveRoom = ({ room_id }: { room_id: number }) =>
+  const moveRoom = ({ room_id }: { room_id: string }) =>
     () => {
       if (!room_id) return;
 
@@ -94,7 +94,7 @@ export default function Tour() {
                 tooltip={hotspot?.type === 'label' && handleCustoHotspot}
                 tooltipArg={{ label: hotspot?.text }}
                 cssClass={hotspot?.type === 'label' && 'label-custom-style'}
-                handleClick={moveRoom({ room_id: Number(hotspot.room_link_id) })}
+                handleClick={moveRoom({ room_id: String(hotspot.room_link_id) })}
               />
             )
         ))}

@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { type Tour } from '@/types/tour';
 import { type Room } from '@/types/room';
 
-export const useGetTour = ({ tour_id }: { tour_id: number }) => {
+export const useGetTour = ({ tour_id }: { tour_id: string }) => {
 
   const GET = async (): Promise<SuccessResponse<Tour> | undefined> => {
     const req = await Axios.get(`/api/tour/${tour_id}`)
@@ -31,7 +31,7 @@ export const useGetTours = () => {
   })
 }
 
-export const useGetTourRooms = ({ id }: { id: number }) => {
+export const useGetTourRooms = ({ id }: { id: string }) => {
   const GET = async (): Promise<SuccessResponse<Room[]> | undefined> => {
     const req = await Axios.get(`/api/tour/${id}/rooms`)
     return req.data
@@ -49,7 +49,7 @@ type Payload = {
 
 export const useCreateTour = () => {
   type Res = {
-    id: number;
+    id: string;
     name: string
   }
 
@@ -66,7 +66,7 @@ export const useCreateTour = () => {
 export const useUpdateTour = () => {
 
   type Payload = {
-    tour_id: number;
+    tour_id: string;
     name: string
   }
 
@@ -87,7 +87,7 @@ export const useUpdateTour = () => {
 
 export const useDeleteTour = () => {
   type Params = {
-    tour_id: number;
+    tour_id: string;
   }
 
   const queryClient = useQueryClient()
