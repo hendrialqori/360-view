@@ -38,7 +38,7 @@ export const ModalInfo = ({ hotspot, coordinateX, coordinateY, forceRenderPanora
     formData.append('_method', 'PUT')
 
     updateHostpot({
-      hostpot_id: Number(hotspot.id),
+      hostpot_id: String(hotspot.id),
       payload: formData
     },
       {

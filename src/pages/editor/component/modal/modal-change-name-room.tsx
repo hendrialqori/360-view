@@ -10,7 +10,7 @@ import { errorToaster } from "@/components/toaster/error-toaster";
 type Props = {
   isShow: boolean;
   room: {
-    id: number;
+    id: string;
     name: string
   }
   onClose: () => void;

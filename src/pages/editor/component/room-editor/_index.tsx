@@ -48,7 +48,7 @@ export const RoomEditor = () => {
 
   const currentHotspot = React.useMemo(() => {
     const temp = hotspots?.data.find((hotspot) =>
-      hotspot.id === Number(hotspotId)
+      hotspot.id === String(hotspotId)
     )
 
     return temp
