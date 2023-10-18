@@ -15,6 +15,9 @@ function App() {
             <Route path="tour/:idTour" element={<Pages.Tour />} />
             <Route path="list-tour" element={<Pages.Tours />} />
             <Route path="editor/:idTour" element={<Pages.Editor />} />
+
+            {/* auth */}
+            <Route path="login" element={<Pages.Login />} />
           </Route>
         </Routes>
       </BrowserRouter>
