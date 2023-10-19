@@ -6,6 +6,7 @@ import { InputTourName } from './input-tour-name'
 import { Tools } from './tools'
 import { Rooms } from './rooms'
 import { ModalPanelRoom } from '../modal/modal-panel-room'
+import { ModalChangeNameRoom } from '../modal/modal-change-name-room'
 
 const modalState = {
   addRoom: false,
@@ -23,6 +24,23 @@ export const SideEditor = () => {
   })
 
   const [panelCoordinate, setPanelCoordinate] = React.useState({ x: 0, y: 0 })
+
+  const [isShowModalChangeName, setIsShowModalChangeName] = React.useState(false)
+
+  const handleModalChangeNameRoom = (type: 'show' | 'close', dataRoom?: typeof room) =>
+    () => {
+      if (type === 'show') {
+
+        setIsShowModalChangeName(true)
+        setRoom({ id: dataRoom?.id as string, name: dataRoom?.name as string })
+        return
+      }
+
+      if (type === 'close') {
+        setIsShowModalChangeName(false)
+        setRoom({ id: null, name: '' })
+      }
+    }
 
   const handleShowModal = React.useCallback((type: keyof typeof modalState) =>
     () => {
@@ -74,14 +92,25 @@ export const SideEditor = () => {
 
       {room.id && (
         <ModalPanelRoom
+          isShowModalChangeName={isShowModalChangeName}
           tourId={String(idTour)}
           roomId={room.id}
           roomName={room.name}
           coordinateX={panelCoordinate.x}
           coordinateY={panelCoordinate.y}
+          onShowModalChangeNameRoom={handleModalChangeNameRoom}
           onClose={handleClosePanel}
         />
       )}
+
+      <ModalChangeNameRoom
+        isShow={isShowModalChangeName}
+        room={{
+          id: room.id as string,
+          name: room.name as string
+        }}
+        onClose={handleModalChangeNameRoom('close')}
+      />
 
       <ModalAddRoom
         isShow={modal.addRoom}

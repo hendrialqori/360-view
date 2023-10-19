@@ -37,8 +37,6 @@ export const Rooms =
     const moveToTargetScene = (id: string) =>
       () => navigate(`/editor/${idTour}?roomId=${id}`)
 
-
-
     return (
       <section className='mt-2' aria-label='ruangan'>
         <header className='flex items-center justify-between pr-4'>

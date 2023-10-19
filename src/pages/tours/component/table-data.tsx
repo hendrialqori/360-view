@@ -30,6 +30,8 @@ const sortMapping = {
   'Status': 'status'
 } as const
 
+const sync = ['pending', 'success'] as const
+
 export const TableData: React.FC<Props> = ({ data }) => {
 
   const { mutate: updateTour, status: updateTourStatus } = useUpdateTour()
@@ -185,6 +187,7 @@ export const TableData: React.FC<Props> = ({ data }) => {
                     <Tooltip id="my-tooltip" />
                     <TableButton
                       disabled={item.sync_status !== 'success'}
+                      disableHover={ item.sync_status !== 'success' }
                       onClick={handleCopyToClipBoard(item.id)}
                       data-tooltip-id="my-tooltip"
                       data-tooltip-content={
@@ -196,9 +199,8 @@ export const TableData: React.FC<Props> = ({ data }) => {
                       Share
                     </TableButton>
                   </>
-
                   {
-                    item.sync_status !== 'success' && (
+                    !sync.includes(item.sync_status as typeof sync[number]) && (
                       <TableButton
                         disabled={updateTourStatus === 'loading'}
                         onClick={handleSyncTour(item.id)}
@@ -233,10 +235,12 @@ export const TableData: React.FC<Props> = ({ data }) => {
   )
 }
 
-type TableButtonProps = React.ComponentProps<'button'> 
+type TableButtonProps = React.ComponentProps<'button'> & {
+  disableHover?: boolean
+}
 
 const TableButton =
-  ({ children, ...rest }: TableButtonProps) => {
+  ({ children, disableHover = false, ...rest }: TableButtonProps) => {
     return (
       <>
         <button
@@ -246,7 +250,7 @@ const TableButton =
             'text-base bg-white text-blue-600',
             'border md:border-2 border-blue-600',
             'text-sm md:text-[15px]',
-            'hover:bg-blue-600 hover:text-white'
+            disableHover ? 'opacity-50' : 'hover:bg-blue-600 hover:text-white'
           )}
           type="button"
         >
