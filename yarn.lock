@@ -549,6 +549,13 @@
     "@types/react" "*"
     csstype "^3.0.2"
 
+"@types/react-tooltip@^4.2.4":
+  version "4.2.4"
+  resolved "https://registry.yarnpkg.com/@types/react-tooltip/-/react-tooltip-4.2.4.tgz#d0acad2a3061806e10aab91dd26a95a77fd35125"
+  integrity sha512-UzjzmgY/VH3Str6DcAGTLMA1mVVhGOyARNTANExrirtp+JgxhaIOVDxq4TIRmpSi4voLv+w4HA9CC5GvhhCA0A==
+  dependencies:
+    react-tooltip "*"
+
 "@types/react@*", "@types/react@^18.0.37":
   version "18.2.8"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.2.8.tgz#a77dcffe4e9af148ca4aa8000c51a1e8ed99e2c8"
@@ -1988,7 +1995,7 @@ react-spinners@^0.13.8:
   resolved "https://registry.yarnpkg.com/react-spinners/-/react-spinners-0.13.8.tgz#5262571be0f745d86bbd49a1e6b49f9f9cb19acc"
   integrity sha512-3e+k56lUkPj0vb5NDXPVFAOkPC//XyhKPJjvcGjyMNPWsBKpplfeyialP74G7H7+It7KzhtET+MvGqbKgAqpZA==
 
-react-tooltip@^5.21.5:
+react-tooltip@*, react-tooltip@^5.21.5:
   version "5.21.5"
   resolved "https://registry.yarnpkg.com/react-tooltip/-/react-tooltip-5.21.5.tgz#3e1bc02a0e674369dea81bb201d6106724dd60cf"
   integrity sha512-ey70qf6pBGi4U6xpyNlZAHobAhlo2dfxmImR2Bzd/DbLTsAYWz3TEaK+RMFuUZMq6hSPRbUHQSkP2rHBq4uFVg==
