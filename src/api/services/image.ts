@@ -19,9 +19,29 @@ export const useGetImages = () => {
   })
 }
 
+export const useUpdateImage = () => {
+  type Params = {
+    image_id: string;
+    payload: FormData
+  }
+
+  const queryClient = useQueryClient()
+
+  const PUT = async ({ image_id, payload }: Params) => {
+   
+    const req = await Axios.post(`/api/photo/${image_id}`, payload)
+    return req.data
+  }
+
+  return useMutation<SuccessResponse<unknown>, AxiosError<ErrorResponse>, Params>({
+    mutationFn: PUT,
+    onSuccess: () => queryClient.invalidateQueries(['IMAGES'])
+  })
+}
+
 export const useDeleteImage = () => {
   type Params = {
-    image_id: number;
+    image_id: string;
   }
 
   const queryClient = useQueryClient()
