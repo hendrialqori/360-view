@@ -6,9 +6,9 @@ type Props = {
 
 const statusColor = {
   local: 'bg-blue-500 px-7',
-  pending: 'bg-yellow-500 px-2',
+  pending: 'bg-yellow-500 px-5',
   success: 'bg-green-600 px-5',
-  changed: 'bg-gray-500 px-[.8rem]'
+  changed: 'bg-gray-500 px-[1rem]'
 }
 
 export const SyncStatus = ({ status }: Props) => {

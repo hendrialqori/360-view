@@ -5,12 +5,13 @@ import { MdOutlineArrowDropUp, MdOutlineArrowDropDown } from 'react-icons/md'
 import dayjs from 'dayjs'
 import 'dayjs/locale/id'
 import { useNavigate } from 'react-router-dom'
-import { useDeleteTour } from '@/api/services/tour'
+import { useDeleteTour, useUpdateTour } from '@/api/services/tour'
 import { successToaster } from '@/components/toaster/success-toaster'
 import { errorToaster } from '@/components/toaster/error-toaster'
 import PulseLoader from 'react-spinners/PulseLoader'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { SyncStatus } from './sync-status'
+import { Tooltip } from 'react-tooltip'
 
 type Props = {
   data: Tour[];
@@ -26,9 +27,12 @@ const thead = [
 const sortMapping = {
   'Tanggal di buat': 'tanggal',
   'Nama Tour': 'name',
+  'Status': 'status'
 } as const
 
 export const TableData: React.FC<Props> = ({ data }) => {
+
+  const { mutate: updateTour, status: updateTourStatus } = useUpdateTour()
 
   const { mutate: deleteTour, status: statusDeleteTour } = useDeleteTour()
 
@@ -52,6 +56,11 @@ export const TableData: React.FC<Props> = ({ data }) => {
     else if (['Nama Tour'].includes(sortBy)) {
       return data?.sort((a, b) =>
         sortOrder === 'asc' ? a.name?.localeCompare(b.name) : b.name?.localeCompare(a.name))
+    } else if (['Status'].includes(sortBy)) {
+      return data?.sort((a, b) =>
+        sortOrder === 'asc'
+          ? a.sync_status?.localeCompare(b.sync_status)
+          : b.sync_status?.localeCompare(a.sync_status))
     }
     else {
       return data
@@ -74,9 +83,33 @@ export const TableData: React.FC<Props> = ({ data }) => {
   const handleCopyToClipBoard = (id: string) =>
     () => {
       const host = window.location.host;
-
       copyFn(`${host}/tour/${id}`)
     }
+
+  const handleSyncTour = (id: string) =>
+    () => {
+      
+      const formData = new FormData()
+      formData.append('sync_status', 'pending')
+      formData.append('_method', 'PUT')
+
+      updateTour(
+        {
+          tour_id: String(id),
+          payload: formData
+        },
+        {
+          onSuccess: () => {
+            successToaster({ message: "Success melakukan sync" })
+          },
+          onError: () => {
+            errorToaster({ message: 'Failed melakukan sync' })
+          }
+        }
+      )
+    }
+
+
 
   const handleDeleteTour = (id: string) =>
     () => {
@@ -137,7 +170,7 @@ export const TableData: React.FC<Props> = ({ data }) => {
                 <SyncStatus status={item.sync_status} />
               </td>
               <td className="w-1/6 py-[.3rem] md:py-[.5rem] lg:py-2 text-center text-sm md:text-base">
-                <div className='flex items-center justify-center gap-3'>
+                <div className='flex items-center justify-start gap-3'>
                   <TableButton
                     onClick={navigateToTour(item.id)}
                   >
@@ -148,12 +181,36 @@ export const TableData: React.FC<Props> = ({ data }) => {
                   >
                     Edit
                   </TableButton>
-                  <TableButton
-                    // disabled={item.sync_status !== 'success'}
-                    onClick={handleCopyToClipBoard(item.id)}
-                  >
-                    Share
-                  </TableButton>
+                  <>
+                    <Tooltip id="my-tooltip" />
+                    <TableButton
+                      disabled={item.sync_status !== 'success'}
+                      onClick={handleCopyToClipBoard(item.id)}
+                      data-tooltip-id="my-tooltip"
+                      data-tooltip-content={
+                        item.sync_status !== 'success' ?
+                          'Tour hanya dapat di share jika Tour sudah tersinkron dengan server' :
+                          ''
+                      }
+                    >
+                      Share
+                    </TableButton>
+                  </>
+
+                  {
+                    item.sync_status !== 'success' && (
+                      <TableButton
+                        disabled={updateTourStatus === 'loading'}
+                        onClick={handleSyncTour(item.id)}
+                      >
+                        {
+                          updateTourStatus === 'loading'
+                            ? <PulseLoader color='skyblue' size={10} />
+                            : 'Sync'
+                        }
+                      </TableButton>
+                    )
+                  }
                   <TableButton
                     disabled={statusDeleteTour === 'loading'}
                     onClick={handleDeleteTour(item.id)}
@@ -178,21 +235,24 @@ export const TableData: React.FC<Props> = ({ data }) => {
 
 type TableButtonProps = React.ComponentProps<'button'>
 
-const TableButton = ({ children, ...rest }: TableButtonProps) => {
+const TableButton =
+  ({ children, ...rest }: TableButtonProps) => {
+    return (
+      <>
+        <button
+          {...rest}
+          className={cn(
+            "transition px-5 md:px-3 py-[.30rem] md:py-[.35rem] rounded-md",
+            'text-base bg-white text-blue-600',
+            'border md:border-2 border-blue-600',
+            'text-sm md:text-[15px]',
+            'hover:bg-blue-600 hover:text-white'
+          )}
+          type="button"
+        >
+          {children}
+        </button>
+      </>
 
-  return (
-    <button
-      {...rest}
-      className={cn(
-        "transition px-5 md:px-3 py-[.30rem] md:py-[.35rem] rounded-md",
-        'text-base bg-white text-blue-600',
-        'border md:border-2 border-blue-600',
-        'text-sm md:text-[15px]',
-        'hover:bg-blue-600 hover:text-white'
-      )}
-      type="button"
-    >
-      {children}
-    </button>
-  )
-}
+    )
+  }

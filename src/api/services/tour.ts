@@ -65,22 +65,27 @@ export const useCreateTour = () => {
 
 export const useUpdateTour = () => {
 
-  type Payload = {
+  type Params = {
     tour_id: string;
-    name: string
+    // sync_status?: string;
+    // name?: string
+    payload: FormData
   }
 
   const queryClient = useQueryClient()
 
-  const PUT = async (payload: Payload) => {
+  const PUT = async (params: Params) => {
 
-    const req = await Axios.put(`/api/tour/${payload.tour_id}`, { name: payload.name })
+    const req = await Axios.post(`/api/tour/${params.tour_id}`, params.payload)
     return req.data
   }
 
-  return useMutation<SuccessResponse<unknown>, AxiosError, Payload>({
+  return useMutation<SuccessResponse<unknown>, AxiosError, Params>({
     mutationFn: PUT,
-    onSuccess: () => queryClient.invalidateQueries(['TOUR'])
+    onSuccess: () => {
+      queryClient.invalidateQueries(['TOUR'])
+      queryClient.invalidateQueries(['TOURS'])
+    }
   })
 }
 

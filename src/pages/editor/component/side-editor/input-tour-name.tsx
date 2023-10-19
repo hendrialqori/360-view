@@ -21,10 +21,15 @@ export const InputTourName = React.memo(() => {
   const { mutate: updateTour, status: updateTourStatus } = useUpdateTour()
 
   const handleUpdateTourName = () => {
+
+    const formData = new FormData()
+    formData.append('name', tourName)
+    formData.append('_method', 'PUT')
+
     updateTour(
       {
         tour_id: String(idTour),
-        name: tourName
+        payload: formData
       },
       {
         onSuccess: () => {
