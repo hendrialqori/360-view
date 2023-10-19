@@ -10,6 +10,7 @@ import { successToaster } from '@/components/toaster/success-toaster'
 import { errorToaster } from '@/components/toaster/error-toaster'
 import PulseLoader from 'react-spinners/PulseLoader'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
+import { SyncStatus } from './sync-status'
 
 type Props = {
   data: Tour[];
@@ -18,6 +19,7 @@ type Props = {
 const thead = [
   'Tanggal di buat',
   'Nama Tour',
+  'Status',
   'Action'
 ] as const
 
@@ -135,8 +137,11 @@ export const TableData: React.FC<Props> = ({ data }) => {
         <tbody>
           {dataMemoize?.map((item, i) => (
             <tr key={i} className={cn((i + 1) % 2 === 0 ? 'bg-blue-500/10' : '')}>
-              <td className="w-1/6 py-[.3rem] md:py-[.5rem] lg:py-2 text-center text-sm md:text-base">{dayjs(item.created_at).locale('id').format('ddd D MMM YYYY')}</td>
-              <td className="w-1/6 py-[.3rem] md:py-[.5rem] lg:py-2 text-center text-sm md:text-base">{item.name}</td>
+              <td className="w-1/6 py-[.3rem] md:py-[.5rem] lg:py-4 text-center text-sm md:text-base">{dayjs(item.created_at).locale('id').format('ddd D MMM YYYY')}</td>
+              <td className="w-1/6 py-[.3rem] md:py-[.5rem] lg:py-4 text-center text-sm md:text-base">{item.name}</td>
+              <td className="w-1/6 py-[.3rem] md:py-[.5rem] lg:py-4 text-center">
+                <SyncStatus status={item.sync_status} />
+              </td>
               <td className="w-1/6 py-[.3rem] md:py-[.5rem] lg:py-2 text-center text-sm md:text-base">
                 <div className='flex items-center justify-center gap-3'>
                   <TableButton
@@ -150,6 +155,7 @@ export const TableData: React.FC<Props> = ({ data }) => {
                     Edit
                   </TableButton>
                   <TableButton
+                    // disabled={item.sync_status !== 'success'}
                     onClick={handleCopyToClipBoard(item.id)}
                   >
                     Share
@@ -184,10 +190,10 @@ const TableButton = ({ children, ...rest }: TableButtonProps) => {
     <button
       {...rest}
       className={cn(
-        "transition px-5 md:px-7 py-[.30rem] md:py-[.35rem] rounded-md",
+        "transition px-5 md:px-3 py-[.30rem] md:py-[.35rem] rounded-md",
         'text-base bg-white text-blue-600',
         'border md:border-2 border-blue-600',
-        'text-sm md:text-base',
+        'text-sm md:text-[15px]',
         'hover:bg-blue-600 hover:text-white'
       )}
       type="button"

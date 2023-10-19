@@ -36,23 +36,25 @@ export default function Tour() {
 
   const { data: hostspots } = useGetRoomHotspots({ id: String(roomId) })
 
-  const moveRoom = ({ room_id }: { room_id: string }) =>
+  const moveRoom = ({ room_link_id }: { room_link_id: string | null }) =>
     () => {
-      if (!room_id) return;
-
-      setRoomId(room_id)
+      if(room_link_id === null) {
+        alert('Tidak ada link room yang di tuju')
+        return
+      }
+      
+      setRoomId(room_link_id)
     }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleCustoHotspot = (hotSpotDiv: HTMLDivElement, args: any) => {
-
-    console.log('this func re-render!', args)
 
     hotSpotDiv.classList.add('custom-tooltip');
     const span = document.createElement('span');
     span.innerHTML = args.label;
     hotSpotDiv.appendChild(span);
     span.style.width = span.scrollWidth - 20 + 'px';
+    span.style.cursor = 'default'
     span.style.marginLeft = -(span.scrollWidth - hotSpotDiv.offsetWidth) / 2 + 'px';
     span.style.marginTop = -span.scrollHeight - 12 + 'px';
 
@@ -94,7 +96,7 @@ export default function Tour() {
                 tooltip={hotspot?.type === 'label' && handleCustoHotspot}
                 tooltipArg={{ label: hotspot?.text }}
                 cssClass={hotspot?.type === 'label' && 'label-custom-style'}
-                handleClick={moveRoom({ room_id: String(hotspot.room_link_id) })}
+                handleClick={hotspot?.type !== 'label' && moveRoom({ room_link_id: String(hotspot.room_link_id) })}
               />
             )
         ))}
