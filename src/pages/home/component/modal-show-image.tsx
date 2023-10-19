@@ -22,7 +22,7 @@ type Props = {
 
 const ORIGIN = import.meta.env.VITE_ORIGIN;
 
-const enebledSync = ['success', 'pending'] as const
+const enebledSync = ['pending'] as const
 
 export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
 
@@ -77,13 +77,12 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
         payload: formData
       },
       {
-        onSuccess: (response) => {
-          console.log(response)
-          successToaster({ message: 'Berhasil meng-sync gambar' })
+        onSuccess: () => {
+          successToaster({ message: 'Success update photo' })
           onClose()
         },
         onError: () => {
-          errorToaster({ message: 'Gagal meng-sync gambar' })
+          errorToaster({ message: 'Failed update photo' })
         }
       }
     )
@@ -159,7 +158,7 @@ export const ModalShowImage = ({ isShow, image, onClose }: Props) => {
                     {
                       statusUpdateImage === 'loading'
                         ? <PulseLoader color='white' size={10} />
-                        : 'SYNC'
+                        : (image?.sync_status === 'success' ? 'RESYNC' : 'SYNC')
                     }
                   </button>
                 )

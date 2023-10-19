@@ -1,4 +1,6 @@
 import React from 'react'
+import Recoil from 'recoil'
+import { mode } from '@/store/mode'
 import { Tour } from '@/types/tour'
 import { cn } from '@/utils/clsx'
 import { MdOutlineArrowDropUp, MdOutlineArrowDropDown } from 'react-icons/md'
@@ -30,9 +32,11 @@ const sortMapping = {
   'Status': 'status'
 } as const
 
-const sync = ['pending', 'success'] as const
+const sync = ['pending'] as const
 
 export const TableData: React.FC<Props> = ({ data }) => {
+
+  const modeAtom = Recoil.useRecoilValue(mode)
 
   const { mutate: updateTour, status: updateTourStatus } = useUpdateTour()
 
@@ -102,16 +106,14 @@ export const TableData: React.FC<Props> = ({ data }) => {
         },
         {
           onSuccess: () => {
-            successToaster({ message: "Success melakukan sync" })
+            successToaster({ message: "Success update tour" })
           },
           onError: () => {
-            errorToaster({ message: 'Failed melakukan sync' })
+            errorToaster({ message: 'Failed update tour' })
           }
         }
       )
     }
-
-
 
   const handleDeleteTour = (id: string) =>
     () => {
@@ -187,7 +189,7 @@ export const TableData: React.FC<Props> = ({ data }) => {
                     <Tooltip id="my-tooltip" />
                     <TableButton
                       disabled={item.sync_status !== 'success'}
-                      disableHover={ item.sync_status !== 'success' }
+                      disableHover={item.sync_status !== 'success'}
                       onClick={handleCopyToClipBoard(item.id)}
                       data-tooltip-id="my-tooltip"
                       data-tooltip-content={
@@ -200,6 +202,7 @@ export const TableData: React.FC<Props> = ({ data }) => {
                     </TableButton>
                   </>
                   {
+                    modeAtom === 'client' &&
                     !sync.includes(item.sync_status as typeof sync[number]) && (
                       <TableButton
                         disabled={updateTourStatus === 'loading'}
@@ -208,7 +211,7 @@ export const TableData: React.FC<Props> = ({ data }) => {
                         {
                           updateTourStatus === 'loading'
                             ? <PulseLoader color='skyblue' size={10} />
-                            : 'Sync'
+                            : ( item.sync_status === 'success' ? 'Resync' : 'Sync' ) 
                         }
                       </TableButton>
                     )
