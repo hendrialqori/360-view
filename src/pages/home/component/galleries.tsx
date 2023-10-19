@@ -4,6 +4,7 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 import { useGetImages } from '@/api/services/image';
 import { type Image } from '@/types/image';
 import { cn } from '@/utils/clsx';
+import { Badge } from './badge';
 
 type Props = {
   onClickImage: (data: Image) => void
@@ -27,10 +28,11 @@ export const Galleries = React.memo(({ onClickImage }: Props) => {
           className={cn(
             'overflow-hidden cursor-pointer border',
             'w-max md:w-full h-max flex justify-center items-center',
-            'rounded-md'
+            'rounded-md relative'
           )}
           onClick={() => onClickImage(image)}
         >
+          <Badge status={image.sync_status} />
           <LazyLoadImage
             src={ORIGIN + image?.thumbnail_path}
             alt='image-view'

@@ -88,7 +88,7 @@ export const TableData: React.FC<Props> = ({ data }) => {
 
   const handleSyncTour = (id: string) =>
     () => {
-      
+
       const formData = new FormData()
       formData.append('sync_status', 'pending')
       formData.append('_method', 'PUT')
@@ -233,7 +233,7 @@ export const TableData: React.FC<Props> = ({ data }) => {
   )
 }
 
-type TableButtonProps = React.ComponentProps<'button'>
+type TableButtonProps = React.ComponentProps<'button'> 
 
 const TableButton =
   ({ children, ...rest }: TableButtonProps) => {
