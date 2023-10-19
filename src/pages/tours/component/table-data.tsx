@@ -75,13 +75,7 @@ export const TableData: React.FC<Props> = ({ data }) => {
     () => {
       const host = window.location.host;
 
-      copyFn(`${host}/tour/${id}`, (status) => {
-        if (status === 'success') {
-          successToaster({ message: 'Behasil copy to clipboard' })
-          return;
-        }
-        errorToaster({ message: 'Gagal copy to clipboard' })
-      })
+      copyFn(`${host}/tour/${id}`)
     }
 
   const handleDeleteTour = (id: string) =>
