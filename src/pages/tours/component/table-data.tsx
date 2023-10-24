@@ -211,7 +211,7 @@ export const TableData: React.FC<Props> = ({ data }) => {
                         {
                           updateTourStatus === 'loading'
                             ? <PulseLoader color='skyblue' size={10} />
-                            : ( item.sync_status === 'success' ? 'Resync' : 'Sync' ) 
+                            : (item.sync_status === 'success' ? 'Resync' : 'Sync')
                         }
                       </TableButton>
                     )
